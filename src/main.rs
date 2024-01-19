@@ -1,4 +1,4 @@
-use std::process::Command;
+// use std::process::Command;
 use structopt::StructOpt;
 use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize};
@@ -8,6 +8,7 @@ use predicates;
 mod tasks;
 mod snippets;
 mod timers;
+mod config;
 mod test_setup;
 
 #[derive(StructOpt)]
