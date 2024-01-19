@@ -6,6 +6,9 @@ use serde_yaml;
 use predicates;
 
 mod tasks;
+mod snippets;
+mod timers;
+mod test_setup;
 
 #[derive(StructOpt)]
 struct Cli {
@@ -28,8 +31,10 @@ fn main() {
             tasks::run()
         },
         Some(AppCommand::Snippets) => {
+            snippets::run()
         },
         Some(AppCommand::Timers) => {
+            timers::run()
         },
         None => {
             println!("No command passed");
@@ -39,11 +44,11 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use std::env;
     use assert_cmd::Command;
     use predicates;
 
     use super::*;
+
 
     #[test]
     fn test_cli_no_command() {
@@ -53,6 +58,8 @@ mod tests {
 
     #[test]
     fn test_tasks_command() {
+        test_setup::setup();
+
         let mut cmd = Command::cargo_bin("task-manager").unwrap();
         cmd.arg("tasks");
 
@@ -63,4 +70,31 @@ mod tests {
         assert.stdout(predicates::str::contains("Tasks placeholder"));
     } 
 
+    #[test]
+    fn test_snippets_command() {
+        test_setup::setup();
+
+        let mut cmd = Command::cargo_bin("task-manager").unwrap();
+        cmd.arg("snippets");
+
+        let assert = cmd.assert();
+        assert.success();
+
+        let assert = cmd.assert();
+        assert.stdout(predicates::str::contains("Snippets placeholder"));
+    } 
+
+    #[test]
+    fn test_timers_command() {
+        test_setup::setup();
+
+        let mut cmd = Command::cargo_bin("task-manager").unwrap();
+        cmd.arg("timers");
+
+        let assert = cmd.assert();
+        assert.success();
+
+        let assert = cmd.assert();
+        assert.stdout(predicates::str::contains("Timers placeholder"));
+    } 
 } 
