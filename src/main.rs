@@ -41,7 +41,7 @@ fn main() {
 mod tests {
     use std::env;
     use assert_cmd::Command;
-    use pred;
+    use predicates;
 
     use super::*;
 
