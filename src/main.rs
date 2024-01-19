@@ -57,10 +57,10 @@ mod tests {
         cmd.arg("tasks");
 
         let assert = cmd.assert();
-
         assert.success();
 
-        assert.stdout(predicate::str::contains("Tasks placeholder"));
+        let assert = cmd.assert();
+        assert.stdout(predicates::str::contains("Tasks placeholder"));
     } 
 
 } 
