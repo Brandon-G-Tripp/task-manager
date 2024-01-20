@@ -18,6 +18,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: rustup component add rustfmt    
       - run: cargo fmt -- --check
+        working-directory: ./task-manager
       - run: rustup component add clippy
       - run: cargo -- -D warnings
       - run: rustc --version 
