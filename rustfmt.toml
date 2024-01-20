@@ -1,1 +1,2 @@
-allow_unused_imports = true
+imports_granularity = "Crate"
+report_unused_imports = false
