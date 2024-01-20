@@ -15,13 +15,29 @@ impl Config {
         }
     } 
 
-    pub fn load(&mut self, path: &str) -> Result<(), ConfigError> {
+    pub fn load(&mut self, path: &str) -> Result<Config, ConfigError> {
         // Check if file exists
         if !Path::new(path).exists() {
             return Err(ConfigError::InvalidPath)
         } 
 
-        Ok(())
+        let file = fs::File::open(path)
+            .map_err(|e| ConfigError::IoError(e))?;
+
+        let mut config: Config = serde_yaml::from_reader(file)
+            .map_err(|e| ConfigError::YamlError(e))?;
+
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map_err(|e| ConfigError::SystemTimeError(e))?
+            .as_secs();
+
+        let new_config = Config {
+            path: config.path,
+            last_updated: now,
+        };
+
+        Ok(new_config)
     }
 } 
 
