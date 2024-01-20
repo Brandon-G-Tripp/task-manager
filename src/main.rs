@@ -1,4 +1,3 @@
-use std::process::Command;
 use structopt::StructOpt;
 use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize};
@@ -8,7 +7,10 @@ use predicates;
 mod tasks;
 mod snippets;
 mod timers;
-mod test_setup;
+mod config;
+
+#[cfg(test)]
+mod tests_common;
 
 #[derive(StructOpt)]
 struct Cli {
@@ -49,6 +51,10 @@ mod tests {
 
     use super::*;
 
+    #[cfg(test)]
+    use super::tests_common::test_setup;
+
+    
 
     #[test]
     fn test_cli_no_command() {
