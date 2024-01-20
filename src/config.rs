@@ -1,5 +1,7 @@
-use std::path::Path;
+use std::{path::Path, fs, time::{SystemTime, UNIX_EPOCH}};
+use serde::Deserialize;
 
+#[derive(Deserialize, Debug)]
 pub struct Config {
     pub path: Option<String>, 
     pub last_updated: u64,
