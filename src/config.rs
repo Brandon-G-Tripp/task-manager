@@ -45,7 +45,8 @@ impl Config {
 pub enum ConfigError {
     InvalidPath, 
     IoError(std::io::Error),
-    YamlError(serde_yaml::Error)
+    YamlError(serde_yaml::Error),
+    SystemTimeError(std::time::SystemTimeError),
 } 
 
 impl std::fmt::Display for ConfigError {
@@ -54,6 +55,7 @@ impl std::fmt::Display for ConfigError {
             Self::InvalidPath => write!(f, "Invalid path provided"),
             Self::IoError(err) => write!(f, "I/O error: {}", err),
             Self::YamlError(err) => write!(f, "Error parsing YAML: {}", err),
+            Self::SystemTimeError(err) => write!(f, "Error getting System time: {}", err),
         } 
     }
 } 
