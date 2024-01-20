@@ -4,6 +4,15 @@ on:
     branches:
       - main
       - 'feature/*'
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+  metadata: read 
+  id-token: write
 
 jobs:
   tests:
@@ -27,3 +36,20 @@ jobs:
       - run: cargo build
       - run: cargo test
 
+  release:
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v3
+      - name: Build release
+        run: cargo build --release
+      - name: Create Github release
+        uses: softprops/actions-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            target/release/*
+      - name: Git tag version 
+        uses: pkgdeps/git-tag-action@v2
+        with:
+          tag: ${{ github.ref_name }}
