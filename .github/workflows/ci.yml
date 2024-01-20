@@ -20,7 +20,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: rustup component add rustfmt    
-      - run: cargo fmt --manifest-path Cargo.toml -- --check -X unused_imports
+      - run: cargo fmt --manifest-path Cargo.toml -- --check
       - run: rustup component add clippy
       - run: cargo clippy -- -D warnings
       - run: rustc --version 
