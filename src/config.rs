@@ -72,7 +72,9 @@ impl std::error::Error for ConfigError {
 
 #[cfg(test)]
 mod tests {
-    use crate::test_setup::create_test_config;
+
+    #[cfg(test)]
+    use crate::tests_common::test_setup;
 
     use super::*;
 
@@ -96,23 +98,30 @@ mod tests {
         assert!(result.is_err());
 
         // Generate valid yaml string 
-        let yaml = create_test_config();
+        let yaml = test_setup::create_test_config();
 
         // Write string to temp file 
-        let tmp_file = "tmp.yml";
-        std::fs::write(tmp_file, yaml);
+        let tmp_file_path = "tmp.yml";
+        std::fs::write(tmp_file_path, yaml);
+
+        // Assert file exists 
+        assert!(Path::new(tmp_file_path).exists());
 
         // Load Valid Path 
-        let mut result = config.load("tests/data/config.yml");
+        let mut result = config.load("tmp.yml");
 
         // Assert Success
         assert!(result.is_ok());
 
+        if let Ok(c) = result {
+            config = c;
+        }; 
+
 
         // Assert fields populated 
-        assert_eq!(config.path, Some("tests/data/config.yml".into()));
+        assert_eq!(config.path, Some("tmp.yml".into()));
         assert!(config.last_updated > 0);
 
-        std::fs::remove_file(tmp_file);
+        std::fs::remove_file(tmp_file_path);
     } 
 } 
