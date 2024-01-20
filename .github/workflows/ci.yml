@@ -55,3 +55,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           git_tag_prefix: ${{ github.ref_name }}
           git_commit_sha: ${{ github.sha }}
+          github_repo: ${{ github.repository }}
