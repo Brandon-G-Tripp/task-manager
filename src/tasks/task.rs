@@ -1,10 +1,11 @@
 use chrono::{DateTime, Utc};
 
+#[derive(PartialEq, Debug)]
 pub struct Task {
-    id: i32,
-    name: String,
-    description: String,
-    due_date: DateTime<Utc>,
+    pub id: i32,
+    pub name: String,
+    pub description: String,
+    pub due_date: DateTime<Utc>,
 } 
 
 impl Task {
