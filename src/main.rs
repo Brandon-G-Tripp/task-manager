@@ -3,8 +3,6 @@
 use structopt::StructOpt;
 use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize};
-use serde_yaml;
-use predicates;
 
 mod tasks;
 mod snippets;
