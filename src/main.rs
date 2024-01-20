@@ -1,3 +1,5 @@
+#![allow(unused_imports, dead_code, unused_variables)]
+
 use structopt::StructOpt;
 use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize};
