@@ -2,7 +2,8 @@ name: CI
 on: 
   push: 
     branches:
-      [ "*" ]
+      - main
+      - 'feature/*'
 
 jobs:
   tests:
@@ -10,5 +11,6 @@ jobs:
     steps: 
       - uses: actions/checkout@v3
       - run: rustc --version 
+      - run: cargo build
       - run: cargo test
 
