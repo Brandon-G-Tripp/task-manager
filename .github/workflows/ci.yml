@@ -49,6 +49,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           release_name: Release ${{ github.ref_name }}
       - name: Git tag version 
-        uses: pkgdeps/git-tag-action@v3
+        uses: pkgdeps/git-tag-action@v2
         with:
-          tag: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git_tag_prefix: ${{ github.ref_name }}
