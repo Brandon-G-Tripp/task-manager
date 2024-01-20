@@ -22,14 +22,14 @@ impl Config {
         } 
 
         let file = fs::File::open(path)
-            .map_err(|e| ConfigError::IoError(e))?;
+            .map_err(ConfigError::IoError)?;
 
-        let mut config: Config = serde_yaml::from_reader(file)
-            .map_err(|e| ConfigError::YamlError(e))?;
+        let config: Config = serde_yaml::from_reader(file)
+            .map_err(ConfigError::YamlError)?;
 
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
-            .map_err(|e| ConfigError::SystemTimeError(e))?
+            .map_err(ConfigError::SystemTimeError)?
             .as_secs();
 
         let new_config = Config {
