@@ -51,5 +51,6 @@ jobs:
       - name: Git tag version 
         uses: pkgdeps/git-tag-action@v2
         with:
+          version: ${{ github.ref_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           git_tag_prefix: ${{ github.ref_name }}
