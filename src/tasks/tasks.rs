@@ -22,6 +22,16 @@ impl Tasks {
 
         index
     } 
+
+    fn delete_task(&mut self, id: i32) -> bool {
+        let index = self.tasks.iter().position(|t| t.id == id);
+        if let Some(index) = index {
+            self.tasks.remove(index);
+            true
+        } else {
+            false
+        } 
+    } 
 } 
 
 #[cfg(test)]
@@ -59,5 +69,24 @@ mod tests {
 
         assert_eq!(stored_tasks.len(), 1);
         assert_eq!(stored_tasks[0], stored_tasks[index]);
+    } 
+
+    #[test]
+    fn test_delete_task() {
+        // Arrange 
+        let mut tasks = Tasks::new();
+        let task1 = Task::new(1, "Task 1".to_string(), "Text for task1".to_string(), Utc::now());
+        let task2 = Task::new(2, "Task 2".to_string(), "Text for task2".to_string(), Utc::now());
+        tasks.add(task1);
+        tasks.add(task2);
+
+        // Act 
+        let deleted = tasks.delete_task(1);
+
+        // Assert 
+        let stored_tasks = tasks.get_tasks();
+        assert!(deleted);
+        assert_eq!(stored_tasks.len(), 1);
+        assert_eq!(tasks.tasks[0].id, 2);
     } 
 } 
