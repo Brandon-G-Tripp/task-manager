@@ -1,29 +1,65 @@
 use crate::tasks::Task;
+use structopt::StructOpt;
 
 #[derive(Debug)]
 pub struct Tasks {
     tasks: Vec<Task>,
+    next_id: u32,
 } 
 
+#[derive(StructOpt)]
+enum TaskCommand {
+    Add {name: String, description: String, due_date: String},
+    List, 
+
+} 
+
+// pub fn run(tasks: &Tasks) {
+//     let cmd = TaskCommand::from_args();
+
+//     match cmd {
+//         TaskCommand::Add { name, description, due_date } => {
+//             tasks.add_task(name, description, due_date);
+//         } 
+//         TaskCommand::List => {
+//             tasks.list()
+//         } 
+//     } 
+// } 
+
 impl Tasks {
-    fn new() -> Self {
+
+    pub fn new() -> Self {
         Self {
-            tasks: Vec::new()
+            tasks: Vec::new(),
+            next_id: 1,
         } 
     } 
+
 
     fn get_tasks(&self) -> &[Task] {
         &self.tasks
     } 
 
-    fn add(&mut self, task: Task) -> usize {
-        self.tasks.push(task);
+    fn add_task(&mut self, name: String, description: String, due_date: String) -> usize {
+        let id = self.next_id;
+        self.next_id += 1;
+
+        let new_task = Task::new(
+            id,
+            name,
+            description,
+            due_date
+        );
+
+        self.tasks.push(new_task);
+
         let index = self.tasks.len() - 1;
 
         index
     } 
 
-    fn delete_task(&mut self, id: i32) -> bool {
+    fn delete_task(&mut self, id: u32) -> bool {
         let index = self.tasks.iter().position(|t| t.id == id);
         if let Some(index) = index {
             self.tasks.remove(index);
@@ -33,7 +69,7 @@ impl Tasks {
         } 
     } 
 
-    fn find_task_by_id(&self, id: i32) -> Option<&Task> {
+    fn find_task_by_id(&self, id: u32) -> Option<&Task> {
         for task in &self.tasks {
             if task.id == id {
                 return Some(task);
@@ -50,11 +86,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_get_tasks() {
+
         let mut tasks = Tasks::new();
 
         // Add some test tasks
-        tasks.add(Task::new(1, "Task".to_string(), "Test".to_string(), Utc::now()));
+        tasks.add_task("Task".to_string(), "Test".to_string(), Utc::now().to_string());
 
         let stored_tasks = tasks.get_tasks();
 
@@ -69,11 +105,9 @@ mod tests {
     #[test]
     fn test_add_task() {
         let mut tasks = Tasks::new();
-        
-        let task = Task::new(1, "Task".to_string(), "Test".to_string(), Utc::now());
 
         // Add some test tasks
-        let index = tasks.add(task);
+        let index = tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), Utc::now().to_string());
 
         let stored_tasks = tasks.get_tasks();
 
@@ -85,10 +119,8 @@ mod tests {
     fn test_delete_task() {
         // Arrange 
         let mut tasks = Tasks::new();
-        let task1 = Task::new(1, "Task 1".to_string(), "Text for task1".to_string(), Utc::now());
-        let task2 = Task::new(2, "Task 2".to_string(), "Text for task2".to_string(), Utc::now());
-        tasks.add(task1);
-        tasks.add(task2);
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), Utc::now().to_string());
+        tasks.add_task("Task 2".to_string(), "Text for task2".to_string(), Utc::now().to_string());
 
         // Act 
         let deleted = tasks.delete_task(1);
@@ -104,8 +136,7 @@ mod tests {
     fn test_delete_invalid() {
         // Arrange 
         let mut tasks = Tasks::new();
-        let task1 = Task::new(1, "Task 1".to_string(), "Text for task1".to_string(), Utc::now());
-        tasks.add(task1);
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), Utc::now().to_string());
 
         // Act
         let deleted = tasks.delete_task(2);
@@ -120,8 +151,7 @@ mod tests {
     fn test_find_task_by_id() {
         // Arrange 
         let mut tasks = Tasks::new();
-        let task1 = Task::new(1, "Task 1".to_string(), "Text for task1".to_string(), Utc::now());
-        tasks.add(task1);
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), Utc::now().to_string());
 
         // Act 
         let found = tasks.find_task_by_id(1);
@@ -134,8 +164,7 @@ mod tests {
     fn test_find_invalid_id() {
         // Arrange 
         let mut tasks = Tasks::new();
-        let task1 = Task::new(1, "Task 1".to_string(), "Text for task1".to_string(), Utc::now());
-        tasks.add(task1);
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), Utc::now().to_string());
 
 
         // Act
