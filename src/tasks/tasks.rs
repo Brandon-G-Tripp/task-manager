@@ -32,6 +32,16 @@ impl Tasks {
             false
         } 
     } 
+
+    fn find_task_by_id(&self, id: i32) -> Option<&Task> {
+        for task in &self.tasks {
+            if task.id == id {
+                return Some(task);
+            } 
+        } 
+
+        None
+    } 
 } 
 
 #[cfg(test)]
@@ -104,5 +114,35 @@ mod tests {
         let stored_tasks = tasks.get_tasks();
         assert!(!deleted);
         assert_eq!(stored_tasks.len(), 1);
+    } 
+
+    #[test]
+    fn test_find_task_by_id() {
+        // Arrange 
+        let mut tasks = Tasks::new();
+        let task1 = Task::new(1, "Task 1".to_string(), "Text for task1".to_string(), Utc::now());
+        tasks.add(task1);
+
+        // Act 
+        let found = tasks.find_task_by_id(1);
+
+        // Assert
+        assert_eq!(found.unwrap().id, 1);
+    } 
+
+    #[test]
+    fn test_find_invalid_id() {
+        // Arrange 
+        let mut tasks = Tasks::new();
+        let task1 = Task::new(1, "Task 1".to_string(), "Text for task1".to_string(), Utc::now());
+        tasks.add(task1);
+
+
+        // Act
+        let found = tasks.find_task_by_id(2);
+
+        // Assert
+        assert_eq!(found, None); 
+
     } 
 } 
