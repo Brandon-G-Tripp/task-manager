@@ -27,11 +27,11 @@ enum AppCommand {
 
 fn main() {
     let cli = Cli::from_args();
-    let tasks = tasks::Tasks::new();
+    let mut tasks = tasks::Tasks::new();
 
     match &cli.command {
         Some(AppCommand::Tasks) => {
-            tasks::run()
+            tasks::run(&mut tasks)
         },
         Some(AppCommand::Snippets) => {
             snippets::run()
