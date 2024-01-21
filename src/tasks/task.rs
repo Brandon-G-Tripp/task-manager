@@ -1,3 +1,5 @@
+use core::fmt;
+
 use chrono::{DateTime, Utc};
 
 #[derive(PartialEq, Debug)]
@@ -6,6 +8,12 @@ pub struct Task {
     pub name: String,
     pub description: String,
     pub due_date: DateTime<Utc>,
+} 
+
+impl fmt::Display for Task {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?} - {} - {} - {}", self.id, self.name, self.description, self.due_date)
+    } 
 } 
 
 impl Task {
@@ -23,10 +31,6 @@ impl Task {
         } 
     } 
 }
-
-pub fn run() {
-    println!("Tasks placeholder");
-} 
 
 #[cfg(test)]
 mod tests {
