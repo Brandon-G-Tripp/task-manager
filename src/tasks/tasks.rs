@@ -193,4 +193,74 @@ mod tests {
         assert_eq!(found, None); 
 
     } 
+
+
+    // testing list tasks
+    #[test]
+    fn test_list_tasks_empty() {
+        // Arrange
+        let tasks = Tasks::new();
+        let mut writer = Vec::new();
+
+        // Act 
+        tasks.list_tasks(&mut writer);
+
+        // Read output 
+        let output = String::from_utf8(writer).unwrap();
+
+        // Assert - capture output and check empty 
+        assert_eq!(
+            output,
+            ""
+        );
+    } 
+
+     #[test] 
+     fn test_list_one_task() {
+
+       // Arrange
+       let mut tasks = Tasks::new();
+       let due_date = Utc::now().to_string();
+       let compare_due_date = due_date.clone();
+       tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), due_date);
+
+       let mut writer = Vec::new();
+
+       // Act 
+       tasks.list_tasks(&mut writer);
+
+       let output = String::from_utf8(writer).unwrap();
+
+       let expected_output = format!("1 - Task 1 - Text for task1 - {}\n", compare_due_date);
+
+       // Assert - output contains task
+       assert_eq!(
+           output,
+           expected_output
+           );
+
+     }
+
+    #[test]
+    fn test_list_multiple() {
+
+      //Arrange
+        let mut tasks = Tasks::new();
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), Utc::now().to_string());
+        tasks.add_task("Task 2".to_string(), "Text for task2".to_string(), Utc::now().to_string());
+
+
+      // Capture output 
+        let mut writer = Vec::new();
+
+        // Act
+        tasks.list_tasks(&mut writer);
+
+        let output = String::from_utf8(writer).unwrap();
+
+      // Assert both tasks printed  
+        assert!(output.contains("1 - Task 1"));
+        assert!(output.contains("2 - Task 2"));
+
+    }
 } 
