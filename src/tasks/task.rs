@@ -2,14 +2,19 @@ use chrono::{DateTime, Utc};
 
 #[derive(PartialEq, Debug)]
 pub struct Task {
-    pub id: i32,
+    pub id: u32,
     pub name: String,
     pub description: String,
     pub due_date: DateTime<Utc>,
 } 
 
 impl Task {
-    pub fn new(id: i32, name: String, description: String, due_date: DateTime<Utc>) -> Self {
+    pub fn new(id: u32, name: String, description: String, due_date: String) -> Self {
+        let due_date = {
+            let datetime = DateTime::parse_from_str(&due_date, "%+").unwrap();
+            datetime.into()
+        };
+            
         Self {
             id,
             name,
@@ -29,16 +34,11 @@ mod tests {
 
     #[test]
     fn test_create_task() {
-        let due_date = {
-            let datetime = DateTime::parse_from_str("2023-03-01T12:00:00Z", "%+").unwrap();
-            datetime.into()
-            
-        };
         let task = Task::new(
             1, 
             "My Task".to_string(), 
             "Description".to_string(), 
-            due_date
+            "2023-03-01T12:00:00Z".to_string(),
         );
 
         assert_eq!(task.id, 1);
