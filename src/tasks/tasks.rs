@@ -89,4 +89,20 @@ mod tests {
         assert_eq!(stored_tasks.len(), 1);
         assert_eq!(tasks.tasks[0].id, 2);
     } 
+
+    #[test]
+    fn test_delete_invalid() {
+        // Arrange 
+        let mut tasks = Tasks::new();
+        let task1 = Task::new(1, "Task 1".to_string(), "Text for task1".to_string(), Utc::now());
+        tasks.add(task1);
+
+        // Act
+        let deleted = tasks.delete_task(2);
+
+        // Assert
+        let stored_tasks = tasks.get_tasks();
+        assert!(!deleted);
+        assert_eq!(stored_tasks.len(), 1);
+    } 
 } 
