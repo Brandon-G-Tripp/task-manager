@@ -1,3 +1,6 @@
+use core::fmt;
+use std::io::Write;
+
 use crate::tasks::Task;
 use structopt::StructOpt;
 
@@ -14,18 +17,18 @@ enum TaskCommand {
 
 } 
 
-// pub fn run(tasks: &Tasks) {
-//     let cmd = TaskCommand::from_args();
+pub fn run(tasks: &mut Tasks) {
+    let cmd = TaskCommand::from_args();
 
-//     match cmd {
-//         TaskCommand::Add { name, description, due_date } => {
-//             tasks.add_task(name, description, due_date);
-//         } 
-//         TaskCommand::List => {
-//             tasks.list()
-//         } 
-//     } 
-// } 
+    match cmd {
+        TaskCommand::Add { name, description, due_date } => {
+            tasks.add_task(name, description, due_date);
+        } 
+        TaskCommand::List => {
+            tasks.list_tasks(&mut std::io::stdout());
+        } 
+    } 
+} 
 
 impl Tasks {
 
@@ -78,15 +81,31 @@ impl Tasks {
 
         None
     } 
+
+    fn list_tasks(&self, mut writer: impl std::io::Write) {
+        let tasks = self.get_tasks();
+
+        for task in tasks {
+           writeln!(writer, "{}", task); 
+        } 
+    }
 } 
 
 #[cfg(test)]
 mod tests {
+    use std::io;
+    use std::io::Write;
+    use std::io::sink;
+    use std::io::stdout;
+
     use chrono::Utc;
+    use assert_cmd::Command;
+    use assert_cmd::prelude::*;
+
     use super::*;
 
     #[test]
-
+    fn test_get_tasks() {
         let mut tasks = Tasks::new();
 
         // Add some test tasks
