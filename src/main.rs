@@ -27,6 +27,7 @@ enum AppCommand {
 
 fn main() {
     let cli = Cli::from_args();
+    let tasks = tasks::Tasks::new();
 
     match &cli.command {
         Some(AppCommand::Tasks) => {
