@@ -8,6 +8,7 @@ pub struct Task {
     pub name: String,
     pub description: String,
     pub due_date: DateTime<Utc>,
+    pub completed: bool,
 } 
 
 impl fmt::Display for Task {
@@ -27,7 +28,8 @@ impl Task {
             id,
             name,
             description,
-            due_date
+            due_date,
+            completed: false,
         } 
     } 
 }
