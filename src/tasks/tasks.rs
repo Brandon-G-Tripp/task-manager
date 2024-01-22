@@ -48,6 +48,12 @@ pub fn run(tasks: &mut Tasks) {
         TaskCommand::List => {
             tasks.list_tasks(&mut std::io::stdout());
         } 
+        TaskCommand::Delete { id } => {
+            tasks.delete_task(id);
+        } 
+        TaskCommand::Update {id, fields } => {
+            println!("Updating...");
+        } 
     } 
 } 
 
@@ -93,10 +99,10 @@ impl Tasks {
         } 
     } 
 
-    fn find_task_by_id(&self, id: u32) -> Option<&Task> {
-        for task in &self.tasks {
+    fn find_task_by_id(&self, id: u32) -> Option<(usize, &Task)> {
+        for (index, task) in self.tasks.iter().enumerate() {
             if task.id == id {
-                return Some(task);
+                return Some((index, task));
             } 
         } 
 
@@ -110,7 +116,33 @@ impl Tasks {
            writeln!(writer, "{}", task); 
         } 
     }
+
+    fn update_task(&mut self, id: u32, fields: UpdateFields) -> Result<(), TaskError> {
+        // Find existing Task 
+        let (index, task) = self.find_task_by_id(id).unwrap();
+        
+        // new task 
+        let due_date = fields.due_date.unwrap_or(task.due_date.to_string());
+
+        let due_date = {
+            let datetime = DateTime::parse_from_str(&due_date, "%+").unwrap();
+            datetime.into()
+        };
+
+        let updated = Task {
+            id: task.id,
+            name: fields.name.unwrap_or(task.name.clone()),
+            description: fields.description.unwrap_or(task.description.clone()),
+            due_date
+        }; 
+        
+        // replace in vector 
+        self.tasks[index] = updated;
+
+        Ok(())
+    } 
 } 
+
 
 #[cfg(test)]
 mod tests {
@@ -194,10 +226,10 @@ mod tests {
         tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), Utc::now().to_string());
 
         // Act 
-        let found = tasks.find_task_by_id(1);
+        let (_, found) = tasks.find_task_by_id(1).unwrap();
 
         // Assert
-        assert_eq!(found.unwrap().id, 1);
+        assert_eq!(found.id, 1);
     } 
 
     #[test]
@@ -284,4 +316,56 @@ mod tests {
         assert!(output.contains("2 - Task 2"));
 
     }
+
+    #[test]
+    fn test_delete_task_removes_it() {
+        // Setup 
+        let mut tasks = Tasks::new();
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), Utc::now().to_string());
+        let mut writer = Vec::new();
+
+        // Act
+        tasks.list_tasks(&mut writer);
+
+        let output = String::from_utf8(writer).unwrap();
+
+      // Assert task printed  
+        assert!(output.contains("1 - Task 1"));
+        
+        // Delete task and assert the len is 0
+        tasks.delete_task(1);
+        assert_eq!(tasks.tasks.len(), 0);
+        
+
+        // Setup output to check writer contains nothing
+        let mut writer = Vec::new();
+        tasks.list_tasks(&mut writer);
+        let output = String::from_utf8(writer).unwrap();
+
+        assert!(output.contains(""));
+    } 
+
+    #[test]
+    fn test_update_task() {
+        // Setup 
+        let mut tasks = Tasks::new();
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), Utc::now().to_string());
+
+        let (index, original_task) = tasks.find_task_by_id(1).unwrap();
+        assert_eq!("Task 1", original_task.name);
+
+        // Update task 
+        let updated_fields = UpdateFields { 
+            name: Some("updated name".to_string()),
+            ..Default::default() 
+        };
+        
+        tasks.update_task(1, updated_fields);
+
+        // Validate after update 
+        let (index, updated_task) = tasks.find_task_by_id(1).unwrap();
+        // assert!(output.contains("1 - update name"));
+        assert_eq!("updated name", updated_task.name);
+        
+    } 
 } 
