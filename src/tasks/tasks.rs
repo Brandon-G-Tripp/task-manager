@@ -25,6 +25,7 @@ enum TaskCommand {
     List, 
     Delete {id: u32},
     Update { id: u32, fields: UpdateFields },
+    Show {id: u32},
 } 
 
 impl std::fmt::Display for TaskError {
@@ -53,6 +54,9 @@ pub fn run(tasks: &mut Tasks) {
         } 
         TaskCommand::Update {id, fields } => {
             println!("Updating...");
+        } 
+        TaskCommand::Show{ id } => {
+            tasks.show_task(id, &mut std::io::stdout());
         } 
     } 
 } 
