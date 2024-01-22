@@ -16,7 +16,8 @@ pub struct Tasks {
 pub enum TaskError {
     NotFound, 
     InvalidTaskId,
-    ParseUpdateError
+    ParseUpdateError,
+    ParseBoolError,
 }
 
 #[derive(StructOpt)]
@@ -34,6 +35,7 @@ impl std::fmt::Display for TaskError {
             TaskError::NotFound => write!(f, "Task not found"),
             TaskError::InvalidTaskId => write!(f, "Invalid task ID"),
             TaskError::ParseUpdateError => write!(f, "Erroring in parsing update"),
+            TaskError::ParseBoolError => write!(f, "Error parsing string to boolean"),
 
         } 
     } 
