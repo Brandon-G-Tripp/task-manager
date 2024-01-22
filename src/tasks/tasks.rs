@@ -141,6 +141,16 @@ impl Tasks {
 
         Ok(())
     } 
+
+    fn show_task(&self, id: u32, writer: &mut impl Write) -> Result<(), TaskError> {
+        match self.find_task_by_id(id) {
+            Some((_, task)) => {
+                writeln!(writer, "{}", task);
+                Ok(())
+            },
+            None => Err(TaskError::NotFound)
+        } 
+    } 
 } 
 
 
@@ -367,5 +377,29 @@ mod tests {
         // assert!(output.contains("1 - update name"));
         assert_eq!("updated name", updated_task.name);
         
+    } 
+
+    // Show command
+    #[test]
+    fn test_show_command() {
+        // Setup
+        let mut tasks = Tasks::new();
+        let due_date = Utc::now().to_string();
+        let compare_due_date = due_date.clone();
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), due_date); 
+
+        let expected = format!(
+            "{} - Task 1 - Text for task1 - {}\n",
+            1,
+            compare_due_date
+        );
+
+        // Act 
+        let mut output = Vec::new();
+        tasks.show_task(1, &mut output);
+        
+        // Assert 
+        let result = String::from_utf8(output).unwrap();
+        assert_eq!(result, expected);
     } 
 } 
