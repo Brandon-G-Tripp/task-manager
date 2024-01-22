@@ -1,8 +1,10 @@
 use core::fmt;
-use std::io::Write;
+use std::{io::Write, error::Error, cell::RefCell, borrow::BorrowMut};
 
 use crate::tasks::Task;
+use chrono::DateTime;
 use structopt::StructOpt;
+use crate::tasks::UpdateFields;
 
 #[derive(Debug)]
 pub struct Tasks {
@@ -10,11 +12,30 @@ pub struct Tasks {
     next_id: u32,
 } 
 
+#[derive(Debug)]
+pub enum TaskError {
+    NotFound, 
+    InvalidTaskId,
+    ParseUpdateError
+}
+
 #[derive(StructOpt)]
 enum TaskCommand {
     Add {name: String, description: String, due_date: String},
     List, 
+    Delete {id: u32},
+    Update { id: u32, fields: UpdateFields },
+} 
 
+impl std::fmt::Display for TaskError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TaskError::NotFound => write!(f, "Task not found"),
+            TaskError::InvalidTaskId => write!(f, "Invalid task ID"),
+            TaskError::ParseUpdateError => write!(f, "Erroring in parsing update"),
+
+        } 
+    } 
 } 
 
 pub fn run(tasks: &mut Tasks) {
