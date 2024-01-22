@@ -6,7 +6,8 @@ use crate::tasks::TaskError;
 pub struct UpdateFields {
     pub name: Option<String>,
     pub description: Option<String>,
-    pub due_date: Option<String>
+    pub due_date: Option<String>,
+    pub completed: Option<String>,
 }
 
 impl UpdateFields {
@@ -15,6 +16,7 @@ impl UpdateFields {
             name: None,
             description: None,
             due_date: None,
+            completed: None,
         } 
     } 
 } 
@@ -29,6 +31,7 @@ impl FromStr for UpdateFields {
             name: fields.get(0).map(|s| s.to_string()),
             description: fields.get(1).map(|s| s.to_string()),
             due_date: fields.get(2).map(|s| s.to_string()),
+            completed: fields.get(3).map(|s| s.to_string()),
         })
     }
     // type Err = ParseUpdateError;
