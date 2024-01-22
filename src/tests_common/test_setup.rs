@@ -25,7 +25,7 @@ fn test_setup() {
 #[test]
 #[should_panic]
 fn test_setup_fail() {
-    let mut cmd = Command::cargo_bin("task-manager-invalid").unwrap();
+    let cmd = Command::cargo_bin("task-manager-invalid").unwrap();
 } 
 
 #[test]
