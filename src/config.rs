@@ -108,7 +108,7 @@ mod tests {
         assert!(Path::new(tmp_file_path).exists());
 
         // Load Valid Path 
-        let mut result = config.load("tmp.yml");
+        let result = config.load("tmp.yml");
 
         // Assert Success
         assert!(result.is_ok());
