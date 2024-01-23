@@ -30,7 +30,7 @@ enum AppCommand {
 
 fn main() {
     let cli = Cli::from_args();
-    let mut tasks = tasks::Tasks::new();
+    let mut tasks = load_or_default();
 
     match &cli.command {
         Some(AppCommand::Tasks(subcommand)) => {
@@ -47,6 +47,13 @@ fn main() {
         }, 
     } 
 }
+
+fn load_or_default() -> tasks::Tasks {
+    match tasks::Tasks::load_from_file() {
+        Ok(tasks) => tasks,
+        Err(_) => tasks::Tasks::new()
+    } 
+} 
 
 #[cfg(test)]
 mod tests {
