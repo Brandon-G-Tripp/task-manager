@@ -2,6 +2,11 @@ use std::str::FromStr;
 
 use crate::tasks::TaskError;
 
+#[derive(Debug)]
+pub enum TaskCommandUpdateArgs {
+    Fields(String)
+} 
+
 #[derive(Debug, Default)]
 pub struct UpdateFields {
     pub name: Option<String>,
@@ -34,8 +39,30 @@ impl FromStr for UpdateFields {
             completed: fields.get(3).map(|s| s.to_string()),
         })
     }
-    // type Err = ParseUpdateError;
-    //
-
 } 
+
+pub fn parse_update_fields(update_args: &str) -> UpdateFields {
+    let mut update_fields = UpdateFields::default();
+
+    for pair in update_args.split(", ") {
+        let kv: Vec<_> = pair.splitn(2, ':').collect();
+
+        if kv.len() == 2 {
+            let key = kv[0];
+            let value = kv[1];
+
+            match key {
+                "name" => update_fields.name = Some(value.to_string()),
+                "description" => update_fields.description = Some(value.to_string()),
+                "due_date" => update_fields.due_date = Some(value.to_string()),
+                "completed" => update_fields.completed = Some(value.to_string()),
+                _ => println!("Unknown field key: {}", key),
+            }
+        } 
+    }
+
+    update_fields
+} 
+
+
 
