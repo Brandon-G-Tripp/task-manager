@@ -49,7 +49,7 @@ fn main() {
 }
 
 fn load_or_default() -> tasks::Tasks {
-    match tasks::Tasks::load_from_file() {
+    match tasks::Tasks::load_from_file(None) {
         Ok(tasks) => tasks,
         Err(_) => tasks::Tasks::new()
     } 
