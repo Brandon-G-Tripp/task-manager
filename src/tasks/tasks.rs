@@ -1,10 +1,12 @@
 use core::fmt;
 use std::{io::Write, error::Error, cell::RefCell, borrow::BorrowMut};
 
-use crate::tasks::Task;
+use crate::tasks::{Task, update};
 use chrono::DateTime;
 use structopt::StructOpt;
 use crate::tasks::UpdateFields;
+
+use super::TaskCommandUpdateArgs;
 
 #[derive(Debug)]
 pub struct Tasks {
@@ -21,12 +23,13 @@ pub enum TaskError {
 }
 
 #[derive(StructOpt)]
-enum TaskCommand {
+pub enum TaskCommand {
     Add {name: String, description: String, due_date: String},
     List, 
     Delete {id: u32},
-    Update { id: u32, fields: UpdateFields },
+    Update { id: u32, fields: String },
     Show {id: u32},
+    Complete {id: u32},
 } 
 
 impl std::fmt::Display for TaskError {
@@ -41,24 +44,28 @@ impl std::fmt::Display for TaskError {
     } 
 } 
 
-pub fn run(tasks: &mut Tasks) {
-    let cmd = TaskCommand::from_args();
+pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
 
     match cmd {
         TaskCommand::Add { name, description, due_date } => {
-            tasks.add_task(name, description, due_date);
+            tasks.add_task(name.to_string(), description.to_string(), due_date.to_string());
         } 
         TaskCommand::List => {
             tasks.list_tasks(&mut std::io::stdout());
         } 
         TaskCommand::Delete { id } => {
-            tasks.delete_task(id);
+            tasks.delete_task(*id);
         } 
-        TaskCommand::Update {id, fields } => {
-            println!("Updating...");
+        TaskCommand::Update { id, fields } => {
+            let update_fields = update::parse_update_fields(&fields);
+            print!("we are in update branch");
+            tasks.update_task(*id, update_fields);
         } 
         TaskCommand::Show{ id } => {
-            tasks.show_task(id, &mut std::io::stdout());
+            tasks.show_task(*id, &mut std::io::stdout());
+        } 
+        TaskCommand::Complete { id } => {
+            tasks.complete_task(*id);
         } 
     } 
 } 
@@ -124,26 +131,44 @@ impl Tasks {
     }
 
     fn update_task(&mut self, id: u32, fields: UpdateFields) -> Result<(), TaskError> {
+
+            print!("we are in update tas");
         // Find existing Task 
-        let (index, task) = self.find_task_by_id(id).unwrap();
-        
-        // new task 
-        let due_date = fields.due_date.unwrap_or(task.due_date.to_string());
+        // let (index, task) = self.find_task_by_id(id).unwrap();
+        let task_id = id;
 
-        let due_date = {
-            let datetime = DateTime::parse_from_str(&due_date, "%+").unwrap();
-            datetime.into()
-        };
+        match self.find_task_by_id(task_id) {
+            Some((index, mut task)) => {
 
-        let updated = Task {
-            id: task.id,
-            name: fields.name.unwrap_or(task.name.clone()),
-            description: fields.description.unwrap_or(task.description.clone()),
-            due_date
-        }; 
-        
-        // replace in vector 
-        self.tasks[index] = updated;
+                // new task 
+                let due_date = fields.due_date.unwrap_or(task.due_date.to_string());
+                let completed = fields.completed.unwrap_or(task.completed.to_string());
+                let completed_bool = match completed.as_str() {
+                    "true" => true,
+                    "false" => false,
+                    _ => return Err(TaskError::ParseBoolError),
+                }; 
+
+                let due_date = {
+                    let datetime = DateTime::parse_from_str(&due_date, "%+").unwrap();
+                    datetime.into()
+                };
+
+                let updated = Task {
+                    id: task.id,
+                    name: fields.name.unwrap_or(task.name.clone()),
+                    description: fields.description.unwrap_or(task.description.clone()),
+                    due_date,
+                    completed: completed_bool
+                }; 
+                
+                // replace in vector 
+                self.tasks[index] = updated;
+            }
+            None => {
+                println!("Task with ID {} not found!", task_id);
+            } 
+        } 
 
         Ok(())
     } 
@@ -155,6 +180,15 @@ impl Tasks {
                 Ok(())
             },
             None => Err(TaskError::NotFound)
+        } 
+    } 
+
+    pub fn complete_task(&mut self, id: u32) -> Result<(), TaskError> {
+        if let Some(index) = self.tasks.iter().position(|t| t.id == id) {
+            self.tasks[index].completed = true;
+            Ok(())
+        } else {
+            Err(TaskError::NotFound)
         } 
     } 
 } 
@@ -387,7 +421,7 @@ mod tests {
 
     // Show command
     #[test]
-    fn test_show_command() {
+    fn test_show_task() {
         // Setup
         let mut tasks = Tasks::new();
         let due_date = Utc::now().to_string();
@@ -408,4 +442,33 @@ mod tests {
         let result = String::from_utf8(output).unwrap();
         assert_eq!(result, expected);
     } 
+
+    // Complete Task command
+    #[test]
+    fn test_complete_task() {
+        // Setup 
+        let mut tasks = Tasks::new();
+        let due_date = Utc::now().to_string();
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), due_date); 
+
+        // Act
+        tasks.complete_task(1);
+
+        // Assert 
+        let (_, task) = tasks.find_task_by_id(1).unwrap();
+        assert_eq!(task.completed, true);
+    }
+
+    #[test]
+    fn test_update_args() {
+        let mut tasks = Tasks::new();
+        let due_date = Utc::now().to_string();
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), due_date); 
+
+        // let cmd = TaskCommand::Update {
+        //     id: 1,
+        //     fields: "name=new name".to_string(),
+        // };
+    } 
+
 } 
