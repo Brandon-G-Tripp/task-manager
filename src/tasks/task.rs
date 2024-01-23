@@ -1,12 +1,14 @@
 use core::fmt;
 
 use chrono::{DateTime, Utc};
+use serde::{Serialize, Deserialize};
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Serialize, Deserialize)]
 pub struct Task {
     pub id: u32,
     pub name: String,
     pub description: String,
+    #[serde(with = "serde_with::rust::display_fromstr")]
     pub due_date: DateTime<Utc>,
     pub completed: bool,
 } 
