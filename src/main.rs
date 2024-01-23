@@ -52,7 +52,10 @@ fn main() {
 fn load_or_default() -> tasks::Tasks {
     match persistence::load_from_file(None) {
         Ok(tasks) => tasks,
-        Err(_) => tasks::Tasks::new()
+        Err(e) => {
+            eprintln!("No tasks storage found: {}", e);
+            tasks::Tasks::new()
+        }
     } 
 } 
 
