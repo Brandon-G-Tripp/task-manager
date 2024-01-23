@@ -3,7 +3,7 @@ use core::fmt;
 use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize};
 
-#[derive(PartialEq, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Serialize, Deserialize, Clone)]
 pub struct Task {
     pub id: u32,
     pub name: String,
