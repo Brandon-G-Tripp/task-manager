@@ -1,9 +1,9 @@
 use std::{io::{Write, self}, error::Error, cell::RefCell, borrow::BorrowMut, fs, path::Path};
-use chrono::DateTime;
+use chrono::{DateTime, Utc};
 
 use crate::tasks::{Task, update};
 
-use super::{TaskError, persistence, UpdateFields};
+use super::{TaskError, persistence, UpdateFields, filtering::DueFilter};
 
 #[cfg(test)]
 mod tests;
@@ -131,6 +131,30 @@ impl Tasks {
             Err(TaskError::NotFound)
         } 
     } 
+
+    pub fn due_tasks(&self, filter: DueFilter) -> Vec<Task> {
+        match filter {
+            DueFilter::PastDue => {
+                self.tasks.iter()
+                    .filter(|t| t.due_date.naive_utc() < Utc::now().naive_utc())
+                    .cloned()
+                    .collect()
+            },
+            DueFilter::DueToday => {
+                self.tasks.iter()
+                    .filter(|t| t.due_date.naive_utc() == Utc::now().naive_utc())
+                    .cloned()
+                    .collect()
+            },
+            DueFilter::DueThisWeek => {
+                self.tasks.iter()
+                    .filter(|t| {
+                        t.due_date.naive_utc() <= Utc::now().naive_utc() + chrono::Duration::days(7)
+                    })
+                    .cloned()
+                    .collect()
+            }, 
+            DueFilter::All => self.tasks.clone()
+        } 
+    } 
 } 
-
-
