@@ -50,6 +50,6 @@ mod tests {
 
         assert_eq!(task.id, 1);
         assert_eq!(task.name, "My Task");
-
-    } 
+        
+    }
 } 
