@@ -6,6 +6,7 @@ use serde_yaml;
 mod task;
 mod crud;
 mod update;
+mod filtering;
 
 pub mod cli;
 pub mod persistence;
