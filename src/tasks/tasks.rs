@@ -274,12 +274,16 @@ mod tests {
     use std::io::Write;
     use std::io::sink;
     use std::io::stdout;
+    use std::env;
+    use std::path::PathBuf;
 
     use chrono::Utc;
     use assert_cmd::Command;
     use assert_cmd::prelude::*;
 
+
     use super::*;
+    use super::Tasks;
 
     #[test]
     fn test_get_tasks() {
@@ -533,16 +537,114 @@ mod tests {
         assert_eq!(task.completed, true);
     }
 
+    // Testing Update_tasks
+
     #[test]
     fn test_update_args() {
+        // Setup
         let mut tasks = Tasks::new();
         let due_date = Utc::now().to_string();
         tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), due_date); 
 
-        // let cmd = TaskCommand::Update {
-        //     id: 1,
-        //     fields: "name=new name".to_string(),
-        // };
+        // Capture ID 
+        let task_id = tasks.tasks[0].id;
+
+        // Define Update 
+        let new_due = Utc::now() + chrono::Duration::days(1);
+        let new_name = "Updated Name".to_string();
+        let fields = UpdateFields {
+            name: Some(new_name.clone()),
+            description: Some("New Desc".to_string()),
+            due_date: Some(new_due.to_string()),
+            completed: None,
+        };
+
+        // Execute update 
+        tasks.update_task(task_id, fields).unwrap();
+
+        // Validate update 
+        let updated = &tasks.tasks[0];
+        assert_eq!(updated.name, new_name);
+        assert_eq!(updated.due_date, new_due);
+        assert_eq!(updated.description, "New Desc".to_string());
+    } 
+
+
+    // Testing load from file and write to file methods 
+    #[test]
+    fn test_load_from_file() {
+        let mut tasks = Tasks::new();
+        let tmp_dir = env::temp_dir();
+        let tmp_file = tmp_dir.join("test_load_file.yml");
+
+        let due_date = Utc::now().to_string();
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), due_date); 
+
+        tasks.write_tasks(&tmp_file).unwrap();
+
+        let tasks = Tasks::load_from_file(Some(&tmp_file)).unwrap();
+
+        assert_eq!(tasks.tasks.len(), 1);
+    } 
+
+    #[test]
+    fn test_read_tasks() {
+        // Setup
+        let mut tasks = Tasks::new();
+        let tmp_dir = env::temp_dir();
+        let tmp_file = tmp_dir.join("test_read_tasks.yml");
+
+        // Create task and add 
+        let due_date = Utc::now().to_string();
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), due_date); 
+
+        // Write tasks
+        tasks.write_tasks(&tmp_file).unwrap();
+
+        let tasks = Tasks::read_tasks(&tmp_file).unwrap();
+
+        assert_eq!(tasks.tasks.len(), 1);
+        assert_eq!(tasks.tasks[0].description, "Text for task1");
+    }
+
+    #[test]
+    fn test_save_tasks() {
+        // Setup 
+        let mut tasks = Tasks::new();
+        let tmp_dir = env::temp_dir();
+        let tmp_file = tmp_dir.join("test_save_tasks.yml");
+
+        // Create task and save tasks 
+        let due_date = Utc::now().to_string();
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), due_date); 
+
+        tasks.save_tasks(Some(&tmp_file)).unwrap();
+
+        // Read from file use direct methods to isolate test 
+        let data = fs::read_to_string(tmp_file).unwrap();
+        let saved_tasks: TasksSchema = serde_yaml::from_str(&data).unwrap();
+
+        assert_eq!(saved_tasks.tasks.len(), 1);
+    } 
+
+
+    #[test]
+    fn test_write_tasks() {
+        // Setup 
+        let mut tasks = Tasks::new();
+        let tmp_dir = env::temp_dir();
+        let tmp_file = tmp_dir.join("test_write_tasks.yml");
+
+        // Create task and save tasks 
+        let due_date = Utc::now().to_string();
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), due_date); 
+
+        tasks.write_tasks(&tmp_file).unwrap();
+
+        let data = fs::read_to_string(tmp_file).unwrap();
+        let saved_tasks: TasksSchema = serde_yaml::from_str(&data).unwrap();
+
+        assert_eq!(saved_tasks.tasks.len(), 1);
     } 
 
 } 
