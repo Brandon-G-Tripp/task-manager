@@ -1,12 +1,15 @@
 use core::fmt;
-use std::{io::Write, error::Error, cell::RefCell, borrow::BorrowMut};
+use std::{io::{Write, self}, error::Error, cell::RefCell, borrow::BorrowMut, fs};
 
 use crate::tasks::{Task, update};
 use chrono::DateTime;
+use serde::{Deserialize, Serialize};
 use structopt::StructOpt;
 use crate::tasks::UpdateFields;
 
 use super::TaskCommandUpdateArgs;
+
+const TASKS_FILE: &str = "./data/tasks.yaml";
 
 #[derive(Debug)]
 pub struct Tasks {
@@ -39,10 +42,35 @@ impl std::fmt::Display for TaskError {
             TaskError::InvalidTaskId => write!(f, "Invalid task ID"),
             TaskError::ParseUpdateError => write!(f, "Erroring in parsing update"),
             TaskError::ParseBoolError => write!(f, "Error parsing string to boolean"),
-
+            TaskError::Io(err) => write!(f, "IO error: {}", err),
+            TaskError::Yaml(err) => write!(f, "YAML error: {}", err),
         } 
     } 
 } 
+
+impl Error for TaskError {}
+
+impl From<std::io::Error> for TaskError {
+
+} 
+
+
+#[derive(Serialize, Deserialize)]
+struct TasksSchema {
+    tasks: Vec<Task>,
+} 
+
+#[derive(StructOpt)]
+pub enum TaskCommand {
+    Add {name: String, description: String, due_date: String},
+    List, 
+    Delete {id: u32},
+    Update { id: u32, fields: String },
+    Show {id: u32},
+    Complete {id: u32},
+} 
+
+
 
 pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
 
@@ -78,6 +106,30 @@ impl Tasks {
             next_id: 1,
         } 
     } 
+
+    fn write_tasks(&self, path: &str) -> Result<(), TaskError> {
+        let schema = TasksSchema {
+            tasks: self.tasks.clone()
+        }; 
+
+        let yaml = serde_yaml::to_string(&schema)?;
+
+        fs::write(TASKS_FILE, yaml)?;
+
+        Ok(())
+    } 
+
+    fn read_tasks(path: &str) -> Result<Self, TaskError> {
+        let data = fs::read_to_string(TASKS_FILE)?;
+
+        let schema: TasksSchema = serde_yaml::from_str(&data)?;
+
+        Ok(Tasks {
+            tasks: schema.tasks,
+            next_id: schema.tasks.len()
+        })
+    } 
+
 
 
     fn get_tasks(&self) -> &[Task] {
