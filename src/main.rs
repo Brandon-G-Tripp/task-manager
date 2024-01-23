@@ -9,7 +9,8 @@ mod snippets;
 mod timers;
 mod config;
 
-use tasks::TaskCommand;
+use tasks::{TaskCommand, persistence};
+use crate::tasks::cli;
 
 #[cfg(test)]
 mod tests_common;
@@ -34,7 +35,7 @@ fn main() {
 
     match &cli.command {
         Some(AppCommand::Tasks(subcommand)) => {
-            tasks::run(&mut tasks, subcommand)
+            tasks::cli::run(&mut tasks, subcommand)
         },
         Some(AppCommand::Snippets) => {
             snippets::run()
@@ -49,7 +50,7 @@ fn main() {
 }
 
 fn load_or_default() -> tasks::Tasks {
-    match tasks::Tasks::load_from_file(None) {
+    match persistence::load_from_file(None) {
         Ok(tasks) => tasks,
         Err(_) => tasks::Tasks::new()
     } 
