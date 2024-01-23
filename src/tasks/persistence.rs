@@ -136,4 +136,13 @@ mod tests {
 
         assert_eq!(saved_tasks.tasks.len(), 1);
     } 
+
+    #[test]
+    fn test_read_invalid_file() {
+        let tmp_dir = env::temp_dir();
+        let invalid_path = tmp_dir.join("invalid.yml");
+
+        let result = read_tasks(&invalid_path);
+        assert!(matches!(result, Err(_)));
+    } 
 }
