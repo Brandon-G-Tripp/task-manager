@@ -117,6 +117,18 @@ impl Tasks {
         } 
     } 
 
+    pub fn load_from_file() -> Result<Tasks, TaskError> {
+        match Tasks::read_tasks(TASKS_FILE) {
+            Ok(tasks) => Ok(tasks),
+            Err(_) => Err(TaskError::NoFile)
+        } 
+    } 
+
+    fn save_tasks(tasks: &Tasks) -> Result<(), TaskError> {
+        tasks.write_tasks(TASKS_FILE)?;
+        Ok(())
+    } 
+
     fn write_tasks(&self, path: &str) -> Result<(), TaskError> {
         let schema = TasksSchema {
             tasks: self.tasks.clone()
@@ -134,9 +146,11 @@ impl Tasks {
 
         let schema: TasksSchema = serde_yaml::from_str(&data)?;
 
+        let next_id = schema.tasks.len() as u32;
+
         Ok(Tasks {
             tasks: schema.tasks,
-            next_id: schema.tasks.len()
+            next_id
         })
     } 
 
