@@ -1,5 +1,5 @@
 use core::fmt;
-use std::{io::{Write, self}, error::Error, cell::RefCell, borrow::BorrowMut, fs};
+use std::{io::{Write, self}, error::Error, cell::RefCell, borrow::BorrowMut, fs, path::Path};
 
 use crate::tasks::{Task, update};
 use chrono::DateTime;
@@ -9,7 +9,7 @@ use crate::tasks::UpdateFields;
 
 use super::TaskCommandUpdateArgs;
 
-const TASKS_FILE: &str = "./data/tasks.yaml";
+pub const TASKS_FILE: &str = "./data/tasks.yaml";
 
 #[derive(Debug)]
 pub struct Tasks {
@@ -100,7 +100,7 @@ pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
         } 
     } 
 
-    match Tasks::save_tasks(tasks) {
+    match Tasks::save_tasks(tasks, None) {
         Ok(()) => (), 
         Err(e) => {
             eprint!("Failed to save tasks: {}", e);
@@ -117,32 +117,34 @@ impl Tasks {
         } 
     } 
 
-    pub fn load_from_file() -> Result<Tasks, TaskError> {
-        match Tasks::read_tasks(TASKS_FILE) {
-            Ok(tasks) => Ok(tasks),
-            Err(_) => Err(TaskError::NoFile)
-        } 
-    } 
-
-    fn save_tasks(tasks: &Tasks) -> Result<(), TaskError> {
-        tasks.write_tasks(TASKS_FILE)?;
+    fn save_tasks(&self, path: Option<&Path>) -> Result<(), TaskError> {
+        let path = path.unwrap_or(Path::new(TASKS_FILE));
+        self.write_tasks(path)?;
         Ok(())
     } 
 
-    fn write_tasks(&self, path: &str) -> Result<(), TaskError> {
+    fn write_tasks(&self, path: &Path) -> Result<(), TaskError> {
         let schema = TasksSchema {
             tasks: self.tasks.clone()
         }; 
 
         let yaml = serde_yaml::to_string(&schema)?;
 
-        fs::write(TASKS_FILE, yaml)?;
+        fs::write(path, yaml)?;
 
         Ok(())
     } 
 
-    fn read_tasks(path: &str) -> Result<Self, TaskError> {
-        let data = fs::read_to_string(TASKS_FILE)?;
+    pub fn load_from_file(task_file_path: Option<&Path>) -> Result<Tasks, TaskError> {
+        let path = task_file_path.unwrap_or(Path::new(TASKS_FILE));
+        match Tasks::read_tasks(path) {
+            Ok(tasks) => Ok(tasks),
+            Err(_) => Err(TaskError::NoFile)
+        } 
+    } 
+
+    fn read_tasks(path: &Path) -> Result<Self, TaskError> {
+        let data = fs::read_to_string(path)?;
 
         let schema: TasksSchema = serde_yaml::from_str(&data)?;
 
@@ -207,10 +209,6 @@ impl Tasks {
     }
 
     fn update_task(&mut self, id: u32, fields: UpdateFields) -> Result<(), TaskError> {
-
-            print!("we are in update tas");
-        // Find existing Task 
-        // let (index, task) = self.find_task_by_id(id).unwrap();
         let task_id = id;
 
         match self.find_task_by_id(task_id) {
