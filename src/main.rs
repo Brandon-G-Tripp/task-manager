@@ -9,6 +9,8 @@ mod snippets;
 mod timers;
 mod config;
 
+use tasks::TaskCommand;
+
 #[cfg(test)]
 mod tests_common;
 
@@ -20,7 +22,8 @@ struct Cli {
 
 #[derive(StructOpt)]
 enum AppCommand {
-    Tasks,
+    #[structopt(name = "tasks")]
+    Tasks(TaskCommand),
     Snippets,
     Timers,
 }
@@ -30,8 +33,8 @@ fn main() {
     let mut tasks = tasks::Tasks::new();
 
     match &cli.command {
-        Some(AppCommand::Tasks) => {
-            tasks::run(&mut tasks)
+        Some(AppCommand::Tasks(subcommand)) => {
+            tasks::run(&mut tasks, subcommand)
         },
         Some(AppCommand::Snippets) => {
             snippets::run()
@@ -50,9 +53,10 @@ mod tests {
     use assert_cmd::Command;
     use predicates;
 
+    use self::tasks::{TaskCommandUpdateArgs, Tasks};
+
     use super::*;
 
-    #[cfg(test)]
     use super::tests_common::test_setup;
 
     
@@ -68,13 +72,17 @@ mod tests {
         test_setup::setup();
 
         let mut cmd = Command::cargo_bin("task-manager").unwrap();
-        cmd.arg("tasks");
 
-        let assert = cmd.assert();
-        assert.success();
+        cmd.arg("tasks")
+            .arg("add")
+            .arg("Task name")
+            .arg("helol desc")
+            .arg("2023-03-01T12:00:00Z");
 
-        let assert = cmd.assert();
-        assert.stdout(predicates::str::contains("Tasks placeholder"));
+        cmd.assert()
+            .success();
+
+        // assert.stdout(predicates::str::contains("Tasks placeholder"));
     } 
 
     #[test]
@@ -103,5 +111,38 @@ mod tests {
 
         let assert = cmd.assert();
         assert.stdout(predicates::str::contains("Timers placeholder"));
+    } 
+
+    #[test]
+    fn test_update_command() {
+        test_setup::setup();
+
+        let mut cmd = Command::cargo_bin("task-manager").unwrap();
+
+        cmd.arg("tasks")
+            .arg("add")
+            .arg("Task name")
+            .arg("helol desc")
+            .arg("2023-03-01T12:00:00Z");
+
+        cmd.assert()
+            .success();
+            
+        let mut cmd = Command::cargo_bin("task-manager").unwrap();
+
+        cmd.arg("tasks")
+            .arg("update")
+            .arg("1")
+            .arg("name: new name");
+
+        // let assert = cmd.assert();
+        cmd.assert()
+            .success();
+
+        let assert = cmd.assert();
+        // assert.stdout(predicates::str::contains(
+        //         "Tasks placeholder"
+        //     )
+        // );
     } 
 } 
