@@ -47,6 +47,32 @@ impl DueFilter {
     } 
 }
 
+pub enum CompletionFilter {
+    All,
+    Complete,
+    Incomplete,
+} 
+
+impl CompletionFilter {
+    pub fn filter(&self, tasks: &[Task]) -> Vec<Task> {
+        match self {
+            CompletionFilter::All => tasks.to_vec(),
+            CompletionFilter::Complete => {
+                tasks.iter()
+                    .filter(|t| t.completed)
+                    .cloned()
+                    .collect()
+            },
+            CompletionFilter::Incomplete => {
+                tasks.iter()
+                    .filter(|t| !t.completed)
+                    .cloned()
+                    .collect()
+            },
+        } 
+    } 
+} 
+
 #[cfg(test)]
 mod tests {
     use chrono::{DateTime, Utc};
