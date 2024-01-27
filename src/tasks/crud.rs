@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 
 use crate::tasks::{Task, update};
 
-use super::{TaskError, persistence, UpdateFields, filtering::DueFilter};
+use super::{TaskError, persistence, UpdateFields, filtering::{DueFilter, CompletionFilter}};
 
 #[cfg(test)]
 mod tests;
@@ -132,8 +132,9 @@ impl Tasks {
         } 
     } 
 
-    pub fn due_tasks(&self, filter: DueFilter) -> Vec<Task> {
-        filter.filter(&self.tasks)
-    } 
-
+    pub fn filter_tasks(tasks: &[Task], due_filter: DueFilter, completion_filter: CompletionFilter) -> Vec<Task> {
+        let mut filtered = due_filter.filter(tasks);
+        filtered = completion_filter.filter(&filtered);
+        filtered
+    }
 } 
