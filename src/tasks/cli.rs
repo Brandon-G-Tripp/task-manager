@@ -8,9 +8,9 @@ use super::{persistence, filtering::{DueFilter, CompletionFilter}};
 pub enum TaskCommand {
     Add {name: String, description: String, due_date: String},
     List {
-        #[clap(short, long)]
+        #[structopt(short, long)]
         due: Option<DueFilter>,
-        #[clap(short, long)]
+        #[structopt(short, long)]
         status: Option<CompletionFilter>,
     }, 
     Delete {id: u32},
@@ -19,7 +19,7 @@ pub enum TaskCommand {
     Complete {id: u32},
 } 
 
-pub fn run(tasks: &mut Tasks, cmd: &TaskCommand, due: Option<DueFilter>, status: Option<CompletionFilter>) {
+pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
 
     match cmd {
         TaskCommand::Add { name, description, due_date } => {

@@ -1,7 +1,10 @@
+use std::{str::FromStr, fmt};
+
 use chrono::Utc;
 
 use super::Task;
 
+#[derive(Debug)]
 pub enum DueFilter {
     PastDue, 
     DueToday, 
@@ -47,6 +50,31 @@ impl DueFilter {
     } 
 }
 
+impl FromStr for DueFilter {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "today" => Ok(DueFilter::DueToday),
+            "week" => Ok(DueFilter::DueThisWeek),
+            "past" => Ok(DueFilter::PastDue),
+            _ => Err(()),
+        } 
+    }
+} 
+
+impl fmt::Display for DueFilter {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            DueFilter::PastDue => write!(f, "past_due"),
+            DueFilter::DueToday => write!(f, "due_today"),
+            DueFilter::DueThisWeek => write!(f, "due_this_week"),
+            DueFilter::All => write!(f, "all")
+        }
+    }
+}
+
+#[derive(Debug)]
 pub enum CompletionFilter {
     All,
     Complete,
@@ -72,6 +100,30 @@ impl CompletionFilter {
         } 
     } 
 } 
+
+impl FromStr for CompletionFilter {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "all" => Ok(CompletionFilter::All),
+            "complete" => Ok(CompletionFilter::Complete),
+            "incomplete" => Ok(CompletionFilter::Incomplete),
+            _ => Err(()),
+        } 
+    }
+} 
+
+impl fmt::Display for CompletionFilter { 
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            CompletionFilter::All => write!(f, "all"),
+            CompletionFilter::Complete => write!(f, "complete"),
+            CompletionFilter::Incomplete => write!(f, "incomplete")
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -128,7 +180,7 @@ mod tests {
     fn returns_all_tasks_when_all_filter() {
         let tasks = create_tasks_completion();
 
-        let result = CompletionFilter::All.filter(&tasks);
+        let result = CompletionFilter::All.filter(&tasks.tasks);
 
         assert_eq!(result.len(), 3);
     } 
@@ -137,7 +189,7 @@ mod tests {
     fn returns_only_completed_tasks() {
         let tasks = create_tasks_completion();
 
-        let result = CompletionFilter::Complete.filter(&tasks);
+        let result = CompletionFilter::Complete.filter(&tasks.tasks);
 
         assert_eq!(result.len(), 2);
         assert!(result[0].completed);
@@ -148,7 +200,7 @@ mod tests {
     fn returns_only_incomplete_tasks() {
         let tasks = create_tasks_completion();
 
-        let result = CompletionFilter::Complete.filter(&tasks);
+        let result = CompletionFilter::Complete.filter(&tasks.tasks);
 
         assert_eq!(result.len(), 1);
         assert!(!result[0].completed);
