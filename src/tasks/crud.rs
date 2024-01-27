@@ -66,15 +66,12 @@ impl Tasks {
         None
     } 
 
-    pub fn list_tasks(&self, mut writer: impl std::io::Write, due: Option<DueFilter>, status: Option<CompletionFilter>) {
+    pub fn list_tasks(&self, mut writer: impl std::io::Write, due: &Option<DueFilter>, status: &Option<CompletionFilter>) {
         let all_tasks = self.get_tasks();
+        let due_filter = due.as_ref().unwrap_or(&DueFilter::All);
+        let completion_filter = status.as_ref().unwrap_or(&CompletionFilter::All);
 
-        let filtered = match (due, status) {
-            (Some(due), Some(status)) => Tasks::filter_tasks(all_tasks, due, status),
-            (Some(due), None) => Tasks::filter_tasks(all_tasks, due, CompletionFilter::All),
-            (None, Some(status)) => Tasks::filter_tasks(all_tasks, DueFilter::All, status),
-            (None, None) => all_tasks.to_vec()
-        }; 
+        let filtered = Tasks::filter_tasks(&all_tasks, &due_filter, &completion_filter);
 
         for task in filtered {
            writeln!(writer, "{}", task); 
@@ -139,7 +136,7 @@ impl Tasks {
         } 
     } 
 
-    pub fn filter_tasks(tasks: &[Task], due_filter: DueFilter, completion_filter: CompletionFilter) -> Vec<Task> {
+    pub fn filter_tasks(tasks: &[Task], due_filter: &DueFilter, completion_filter: &CompletionFilter) -> Vec<Task> {
         let mut filtered = due_filter.filter(&tasks);
         filtered = completion_filter.filter(&filtered);
         filtered
