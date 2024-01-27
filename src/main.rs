@@ -35,7 +35,7 @@ fn main() {
 
     match &cli.command {
         Some(AppCommand::Tasks(subcommand)) => {
-            tasks::cli::run(&mut tasks, subcommand)
+            tasks::cli::run(&mut tasks, subcommand, subcommand.due, subcommand.status)
         },
         Some(AppCommand::Snippets) => {
             snippets::run()
