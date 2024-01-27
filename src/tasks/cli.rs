@@ -1,13 +1,18 @@
-use structopt::StructOpt;
+use structopt::{StructOpt, clap};
 
 use crate::tasks::{crud::Tasks, update};
 
-use super::persistence;
+use super::{persistence, filtering::{DueFilter, CompletionFilter}};
 
 #[derive(StructOpt)]
 pub enum TaskCommand {
     Add {name: String, description: String, due_date: String},
-    List, 
+    List {
+        #[clap(short, long)]
+        due: Option<DueFilter>,
+        #[clap(short, long)]
+        status: Option<CompletionFilter>,
+    }, 
     Delete {id: u32},
     Update { id: u32, fields: String },
     Show {id: u32},
@@ -20,8 +25,8 @@ pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
         TaskCommand::Add { name, description, due_date } => {
             tasks.add_task(name.to_string(), description.to_string(), due_date.to_string());
         } 
-        TaskCommand::List => {
-            tasks.list_tasks(&mut std::io::stdout());
+        TaskCommand::List { due, status } => {
+            tasks.list_tasks(&mut std::io::stdout(), due, status);
         } 
         TaskCommand::Delete { id } => {
             tasks.delete_task(*id);
