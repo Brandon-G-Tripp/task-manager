@@ -14,8 +14,6 @@ pub enum TaskCommand {
     Complete {id: u32},
 } 
 
-
-
 pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
 
     match cmd {
