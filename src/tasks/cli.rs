@@ -1,4 +1,4 @@
-use structopt::{StructOpt, clap};
+use structopt::StructOpt;
 
 use crate::tasks::{crud::Tasks, update};
 
@@ -26,7 +26,7 @@ pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
             tasks.add_task(name.to_string(), description.to_string(), due_date.to_string());
         } 
         TaskCommand::List { due, status } => {
-            tasks.list_tasks(&mut std::io::stdout(), *due, *status);
+            tasks.list_tasks(&mut std::io::stdout(), due, status);
         } 
         TaskCommand::Delete { id } => {
             tasks.delete_task(*id);
