@@ -19,14 +19,14 @@ pub enum TaskCommand {
     Complete {id: u32},
 } 
 
-pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
+pub fn run(tasks: &mut Tasks, cmd: &TaskCommand, due: Option<DueFilter>, status: Option<CompletionFilter>) {
 
     match cmd {
         TaskCommand::Add { name, description, due_date } => {
             tasks.add_task(name.to_string(), description.to_string(), due_date.to_string());
         } 
         TaskCommand::List { due, status } => {
-            tasks.list_tasks(&mut std::io::stdout(), due, status);
+            tasks.list_tasks(&mut std::io::stdout(), *due, *status);
         } 
         TaskCommand::Delete { id } => {
             tasks.delete_task(*id);
