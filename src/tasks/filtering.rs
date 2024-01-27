@@ -46,3 +46,51 @@ impl DueFilter {
         } 
     } 
 }
+
+#[cfg(test)]
+mod tests {
+    use chrono::{DateTime, Utc};
+
+    use super::*;
+    use crate::tests_common::create_tasks;
+
+    #[test]
+    fn filter_past_due() {
+        let tasks = create_tasks();
+        let results = DueFilter::PastDue.filter(&tasks);
+        println!("{:?}", results);
+        assert_eq!(results.len(), 2);
+        assert_eq!(results[0].id, 1);
+        assert_eq!(results[1].id, 2);
+    } 
+
+    #[test]
+    fn filter_due_today() {
+        let tasks = create_tasks();
+        let results = DueFilter::DueToday.filter(&tasks);
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].id, 3);
+    } 
+
+    #[test]
+    fn filter_due_this_week() {
+        let tasks = create_tasks();
+        let results = DueFilter::DueThisWeek.filter(&tasks);
+        assert_eq!(results.len(), 3);
+        assert_eq!(results[0].id, 3);
+        assert_eq!(results[1].id, 4);
+        assert_eq!(results[2].id, 5);
+    }
+
+    #[test]
+    fn filter_all() {
+        let tasks = create_tasks();
+        let results = DueFilter::All.filter(&tasks);
+        assert_eq!(results.len(), 5);
+        assert_eq!(results[0].id, 1);
+        assert_eq!(results[1].id, 2);
+        assert_eq!(results[2].id, 3);
+        assert_eq!(results[3].id, 4);
+        assert_eq!(results[4].id, 5);
+    }  
+} 
