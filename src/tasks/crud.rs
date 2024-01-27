@@ -66,10 +66,17 @@ impl Tasks {
         None
     } 
 
-    pub fn list_tasks(&self, mut writer: impl std::io::Write) {
-        let tasks = self.get_tasks();
+    pub fn list_tasks(&self, mut writer: impl std::io::Write, due: Option<DueFilter>, status: Option<CompletionFilter>) {
+        let all_tasks = self.get_tasks();
 
-        for task in tasks {
+        let filtered = match (due, status) {
+            (Some(due), Some(status)) => Tasks::filter_tasks(&all_tasks, due, status),
+            (Some(due), None) => Tasks::filter_tasks(&all_tasks, due, CompletionFilter::All),
+            (None, Some(status)) => Tasks::filter_tasks(&all_tasks, DueFilter::All, status),
+            (None, None) => all_tasks.to_vec()
+        }; 
+
+        for task in filtered {
            writeln!(writer, "{}", task); 
         } 
     }
