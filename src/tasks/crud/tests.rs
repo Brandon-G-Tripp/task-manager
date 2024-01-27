@@ -115,7 +115,7 @@ mod tests {
         let mut writer = Vec::new();
 
         // Act 
-        tasks.list_tasks(&mut writer);
+        tasks.list_tasks(&mut writer, None, None);
 
         // Read output 
         let output = String::from_utf8(writer).unwrap();
@@ -139,7 +139,7 @@ mod tests {
        let mut writer = Vec::new();
 
        // Act 
-       tasks.list_tasks(&mut writer);
+       tasks.list_tasks(&mut writer, None, None);
 
        let output = String::from_utf8(writer).unwrap();
 
@@ -166,7 +166,7 @@ mod tests {
         let mut writer = Vec::new();
 
         // Act
-        tasks.list_tasks(&mut writer);
+        tasks.list_tasks(&mut writer, None, None);
 
         let output = String::from_utf8(writer).unwrap();
 
@@ -184,7 +184,7 @@ mod tests {
         let mut writer = Vec::new();
 
         // Act
-        tasks.list_tasks(&mut writer);
+        tasks.list_tasks(&mut writer, None, None);
 
         let output = String::from_utf8(writer).unwrap();
 
@@ -198,7 +198,7 @@ mod tests {
 
         // Setup output to check writer contains nothing
         let mut writer = Vec::new();
-        tasks.list_tasks(&mut writer);
+        tasks.list_tasks(&mut writer, None, None);
         let output = String::from_utf8(writer).unwrap();
 
         assert!(output.contains(""));
