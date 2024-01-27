@@ -14,8 +14,8 @@ pub enum DueFilter {
 
 
 impl DueFilter {
-    pub fn filter(self, tasks: &[Task]) -> Vec<Task> {
-        match self {
+    pub fn filter(&self, tasks: &[Task]) -> Vec<Task> {
+        match *self {
             DueFilter::PastDue => {
                 let today = Utc::now().naive_utc();
                 tasks.iter()
@@ -51,14 +51,14 @@ impl DueFilter {
 }
 
 impl FromStr for DueFilter {
-    type Err = ();
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "today" => Ok(DueFilter::DueToday),
             "week" => Ok(DueFilter::DueThisWeek),
             "past" => Ok(DueFilter::PastDue),
-            _ => Err(()),
+            _ => Err("Error parsing flag from string".to_string()),
         } 
     }
 } 
@@ -83,7 +83,7 @@ pub enum CompletionFilter {
 
 impl CompletionFilter {
     pub fn filter(&self, tasks: &[Task]) -> Vec<Task> {
-        match self {
+        match *self {
             CompletionFilter::All => tasks.to_vec(),
             CompletionFilter::Complete => {
                 tasks.iter()
@@ -102,14 +102,14 @@ impl CompletionFilter {
 } 
 
 impl FromStr for CompletionFilter {
-    type Err = ();
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "all" => Ok(CompletionFilter::All),
             "complete" => Ok(CompletionFilter::Complete),
             "incomplete" => Ok(CompletionFilter::Incomplete),
-            _ => Err(()),
+            _ => Err("Error parsing flag from string".to_string()),
         } 
     }
 } 
