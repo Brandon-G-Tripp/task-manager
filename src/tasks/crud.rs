@@ -133,28 +133,7 @@ impl Tasks {
     } 
 
     pub fn due_tasks(&self, filter: DueFilter) -> Vec<Task> {
-        match filter {
-            DueFilter::PastDue => {
-                self.tasks.iter()
-                    .filter(|t| t.due_date.naive_utc() < Utc::now().naive_utc())
-                    .cloned()
-                    .collect()
-            },
-            DueFilter::DueToday => {
-                self.tasks.iter()
-                    .filter(|t| t.due_date.naive_utc() == Utc::now().naive_utc())
-                    .cloned()
-                    .collect()
-            },
-            DueFilter::DueThisWeek => {
-                self.tasks.iter()
-                    .filter(|t| {
-                        t.due_date.naive_utc() <= Utc::now().naive_utc() + chrono::Duration::days(7)
-                    })
-                    .cloned()
-                    .collect()
-            }, 
-            DueFilter::All => self.tasks.clone()
-        } 
+        filter.filter(&self.tasks)
     } 
+
 } 
