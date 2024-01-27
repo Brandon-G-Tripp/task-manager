@@ -70,9 +70,9 @@ impl Tasks {
         let all_tasks = self.get_tasks();
 
         let filtered = match (due, status) {
-            (Some(due), Some(status)) => Tasks::filter_tasks(&all_tasks, due, status),
-            (Some(due), None) => Tasks::filter_tasks(&all_tasks, due, CompletionFilter::All),
-            (None, Some(status)) => Tasks::filter_tasks(&all_tasks, DueFilter::All, status),
+            (Some(due), Some(status)) => Tasks::filter_tasks(all_tasks, due, status),
+            (Some(due), None) => Tasks::filter_tasks(all_tasks, due, CompletionFilter::All),
+            (None, Some(status)) => Tasks::filter_tasks(all_tasks, DueFilter::All, status),
             (None, None) => all_tasks.to_vec()
         }; 
 
@@ -140,7 +140,7 @@ impl Tasks {
     } 
 
     pub fn filter_tasks(tasks: &[Task], due_filter: DueFilter, completion_filter: CompletionFilter) -> Vec<Task> {
-        let mut filtered = due_filter.filter(tasks);
+        let mut filtered = due_filter.filter(&tasks);
         filtered = completion_filter.filter(&filtered);
         filtered
     }
