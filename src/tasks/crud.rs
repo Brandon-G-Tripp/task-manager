@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 
 use crate::tasks::{Task, update};
 
-use super::{TaskError, persistence, UpdateFields, filtering::{DueFilter, CompletionFilter}};
+use super::{TaskError, persistence, UpdateFields, filtering::{DueFilter, CompletionFilter}, stats, Stats};
 
 #[cfg(test)]
 mod tests;
@@ -141,4 +141,9 @@ impl Tasks {
         filtered = completion_filter.filter(&filtered);
         filtered
     }
+
+
+    pub fn stats(&self) -> Stats {
+        stats::Stats::new(&self.tasks)
+    } 
 } 
