@@ -7,6 +7,7 @@ mod task;
 mod crud;
 mod update;
 mod filtering;
+mod stats;
 
 pub mod cli;
 pub mod persistence;
@@ -15,6 +16,7 @@ pub use cli::*;
 pub use task::*;
 pub use crud::*;
 pub use update::*;
+pub use stats::*;
 
 #[derive(Debug)]
 pub enum TaskError {
