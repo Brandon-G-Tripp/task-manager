@@ -17,6 +17,7 @@ pub enum TaskCommand {
     Update { id: u32, fields: String },
     Show {id: u32},
     Complete {id: u32},
+    Stats,
 } 
 
 pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
@@ -41,6 +42,10 @@ pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
         } 
         TaskCommand::Complete { id } => {
             tasks.complete_task(*id);
+        } 
+        TaskCommand::Stats => {
+            let stats = tasks.stats();
+            println!("{:#?}", stats);
         } 
     } 
 
