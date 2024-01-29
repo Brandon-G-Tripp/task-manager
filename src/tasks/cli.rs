@@ -45,7 +45,7 @@ pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
         } 
         TaskCommand::Stats => {
             let stats = tasks.stats();
-            println!("{:#?}", stats);
+            println!("{}", stats);
         } 
     } 
 
