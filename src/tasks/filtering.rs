@@ -200,7 +200,7 @@ mod tests {
     fn returns_only_incomplete_tasks() {
         let tasks = create_tasks_completion();
 
-        let result = CompletionFilter::Complete.filter(&tasks.tasks);
+        let result = CompletionFilter::Incomplete.filter(&tasks.tasks);
 
         assert_eq!(result.len(), 1);
         assert!(!result[0].completed);
