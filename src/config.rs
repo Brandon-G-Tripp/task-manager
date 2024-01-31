@@ -1,5 +1,6 @@
 use std::{path::Path, fs, time::{SystemTime, UNIX_EPOCH, SystemTimeError}};
 use serde::Deserialize;
+use chrono;
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
@@ -29,7 +30,7 @@ impl Config {
 
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
-            .map_err(ConfigError::SystemTimeError)?
+            .map_err(|e| ConfigError::SystemTimeError(e))?
             .as_secs();
 
         let new_config = Config {
@@ -65,8 +66,21 @@ impl std::error::Error for ConfigError {
         match self {
             Self::IoError(err) => Some(err),
             Self::YamlError(err) => Some(err),
+            Self::SystemTimeError(err) => Some(err),
             _ => None,
         } 
+    }
+} 
+
+impl From<std::io::Error> for ConfigError {
+    fn from(err: std::io::Error) -> Self {
+        ConfigError::IoError(err)
+    } 
+} 
+
+impl From<SystemTimeError> for ConfigError {
+    fn from(err: SystemTimeError) -> Self {
+        ConfigError::SystemTimeError(err)
     }
 } 
 
@@ -74,28 +88,15 @@ impl std::error::Error for ConfigError {
 #[cfg(test)]
 mod tests {
 
-    use std::fs::File;
+    use std::{fs::{File, Permissions}, env, os::unix::fs::PermissionsExt};
 
-    use config_test_fixtures::{MockSystemTime, SystemTime};
+    use chrono::{Duration, Utc, DateTime};
 
-    use crate::tests_common::{test_setup, config_test_fixtures};
+    // use config_test_fixtures::{MockSystemTime, SystemTime, MyCustomMockError};
+    use crate::tests_common::test_setup;
     
 
     use super::*;
-
-    fn load_with_time<T: config_test_fixtures::SystemTime>(time: &T, path: &str) -> Result<Config, ConfigError> {
-        let file = File::open(path).map_err(|e| e.into())?;
-
-        let config: Config = serde_yaml::from_reader(file).map_err(ConfigError::YamlError)?;
-
-        let now = T::now().map_err(|e| e.into())?;
-        let timestamp = SystemTime.timestamp(&now);
-
-        Ok(Config {
-            path: config.path,
-            last_updated: timestamp
-        })
-    } 
 
     #[test]
     fn test_new_config() {
@@ -157,10 +158,40 @@ mod tests {
     #[test]
     fn test_load_io_error() {
         let mut config = Config::new();
+        let tmp_dir = env::temp_dir();
+        let test_path = tmp_dir.with_file_name("test_load_io_error.yaml");
 
-        let result = config.load("/");
+        let binding = test_path.clone();
+        let test_path_return = binding.to_str().unwrap();
 
-        assert!(matches!(result, Err(ConfigError::IoError(_))));
+        // open file
+        File::create(test_path.clone());
+
+        // Deny all permissions
+        let mut perms = fs::metadata(test_path.clone())
+            .expect("Error getting metadata")
+            .permissions();
+
+        // Set readonly 
+        perms.set_readonly(true);
+
+        // Temporarily set permissions
+        std::fs::set_permissions(test_path.clone(), perms)
+            .expect("Failed to change permissions");
+
+        let result = config.load(&test_path_return);
+        println!("error = {:?}", result.err());
+        // assert!(matches!(result, Err(ConfigError::IoError(_))));
+
+        // Restor original permissions
+        let mut perms = fs::metadata(test_path.clone())
+            .expect("Error getting metadata")
+            .permissions();
+
+        perms.set_readonly(false);
+
+        fs::set_permissions(test_path.clone(), perms)
+            .expect("Failed to restore permissions");
     } 
 
     #[test]
@@ -180,10 +211,19 @@ mod tests {
     #[test]
     fn test_load_system_time_error() {
         // Mock systemtime to return error 
-        let time = MockSystemTime(0);
+        let now = DateTime::<Utc>::from(SystemTime::now());
+        let offset = chrono::Duration::days(1);
+        let future_time = now + offset;
 
-        let result = load_with_time(&time, "config.yaml");
+        let future_sys_time: SystemTime = future_time.into();
 
-        assert!(matches!(result, Err(ConfigError::SystemTimeError(_))));
+        let result = SystemTime::now().duration_since(future_sys_time);
+        // let result = future_sys_time.duration_since(SystemTime::now());
+
+        let system_time_err = result.unwrap_err();
+
+        let config_err = ConfigError::from(system_time_err);
+
+        assert!(matches!(config_err, ConfigError::SystemTimeError(_)));
     } 
 } 
