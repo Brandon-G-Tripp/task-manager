@@ -56,3 +56,42 @@ pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
         } 
     } 
 } 
+
+
+#[cfg(test)]
+mod tests{
+    use super::*;
+
+    #[test]
+    fn test_add_command_parsing() {
+        let mut tasks = Tasks::new();
+
+        let cmd = TaskCommand::Add {
+            name: "Task 1".to_string(),
+            description: "Description 1".to_string(), 
+            due_date: "2023-01-01".to_string()
+        };
+
+        run(&mut tasks, &cmd);
+        
+        assert_eq!(tasks.tasks.len(), 1);
+        assert_eq!(tasks.tasks[0].name, "Task 1");
+        assert_eq!(tasks.tasks[0].description, "Description 1");
+        assert_eq!(tasks.tasks[0].due_date.to_string(), "2023-01-01");
+    }
+
+    #[test]
+    fn test_list_command() {
+        let mut tasks = Tasks::new();
+        tasks.add_task("Task 1".to_string(), "".to_string(), "".to_string());
+        
+        let mut writer = Vec::new();
+        tasks.list_tasks(&mut writer, &None, &None);
+
+        let output = String::from_utf8(writer).unwrap();
+        
+        assert!(output.contains("Task 1"));
+    }
+}
+    
+    
