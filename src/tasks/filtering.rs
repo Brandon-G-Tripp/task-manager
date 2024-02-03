@@ -149,6 +149,7 @@ mod tests {
     fn filter_due_today() {
         let tasks = create_tasks();
         let results = DueFilter::DueToday.filter(&tasks);
+        println!("{:?}", results);
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].id, 3);
     } 
@@ -206,4 +207,36 @@ mod tests {
         assert_eq!(result.len(), 1);
         assert!(!result[0].completed);
     } 
+
+    #[test]
+    fn parse_due_filter_from_str() {
+        let today_filter = DueFilter::from_str("today");
+        assert!(matches!(today_filter, Ok(DueFilter::DueToday)));
+        let week_filter = DueFilter::from_str("week");
+        assert!(matches!(week_filter, Ok(DueFilter::DueThisWeek)));
+        let past_filter = DueFilter::from_str("past");
+        assert!(matches!(past_filter, Ok(DueFilter::PastDue)));
+        assert!(DueFilter::from_str("invalid").is_err());
+    }
+
+    #[test]
+    fn format_due_filter() {
+        assert_eq!(format!("{}", DueFilter::DueToday), "due_today");
+        assert_eq!(format!("{}", DueFilter::DueThisWeek), "due_this_week");
+        assert_eq!(format!("{}", DueFilter::PastDue), "past_due");
+        assert_eq!(format!("{}", DueFilter::All), "all");
+    }
+
+    #[test]
+    fn parse_completion_filter_from_str() {
+        let all_filter = CompletionFilter::from_str("all");
+        let complete_filter = CompletionFilter::from_str("complete");
+        let incomplete_filter = CompletionFilter::from_str("incomplete");
+
+        assert!(matches!(all_filter, Ok(CompletionFilter::All)));
+        assert!(matches!(complete_filter, Ok(CompletionFilter::Complete)));
+        assert!(matches!(incomplete_filter, Ok(CompletionFilter::Incomplete)));
+        assert!(CompletionFilter::from_str("invalid").is_err());
+    } 
+    
 } 
