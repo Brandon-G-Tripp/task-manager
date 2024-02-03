@@ -60,6 +60,10 @@ pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
 
 #[cfg(test)]
 mod tests{
+    use chrono::Utc;
+
+    use crate::tests_common::create_tasks;
+
     use super::*;
 
     #[test]
@@ -122,6 +126,7 @@ mod tests{
         assert_eq!(tasks.tasks[0].name, "New Name");
         assert!(tasks.tasks[0].completed);
     } 
+
     fn test_stats_command() {
         let mut tasks = Tasks::new();
         tasks.add_task("Task 1".to_string(), "".to_string(), "2023-03-01T12:00:00Z".to_string());
@@ -138,6 +143,42 @@ mod tests{
         let output = String::from_utf8(writer).unwrap();
         assert!(output.contains("Tasks: 3"));
         assert!(output.contains("Completed: 1")); 
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_add_command_invalid_due_date() {
+        let mut tasks = Tasks::new();
+
+        let cmd = TaskCommand::Add {
+            name: "Task 1".to_string(),
+            description: "Description 1".to_string(),
+            due_date: "invalid date".to_string() 
+        };
+
+        run(&mut tasks, &cmd);
+    }
+
+    #[test]
+    fn test_list_command_with_due_filter() {
+        let mut tasks = Tasks::new();
+        tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), Utc::now().to_string());
+        tasks.add_task("Task 2".to_string(), "".to_string(), "2023-03-01T12:00:00Z".to_string());
+
+
+        let cmd = TaskCommand::List { 
+            due: Some(DueFilter::DueToday), 
+            status: None 
+        };
+        
+        let mut writer = Vec::new();
+        run(&mut tasks, &cmd);
+        tasks.list_tasks(&mut writer, &Some(DueFilter::DueToday), &None);
+
+        let output = String::from_utf8(writer).unwrap();
+        println!("{:?}", output);
+        assert!(output.contains("Task 1"));
+        assert!(!output.contains("Task 2"));
     }
 }
     
