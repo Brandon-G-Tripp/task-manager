@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 
 use crate::tasks::{Task, update};
 
-use super::{TaskError, persistence, UpdateFields, filtering::{DueFilter, CompletionFilter}, stats, Stats};
+use super::{Stats, TaskError, persistence, UpdateFields, filtering::{DueFilter, CompletionFilter}, stats};
 
 #[cfg(test)]
 mod tests;
