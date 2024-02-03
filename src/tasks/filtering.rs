@@ -24,15 +24,16 @@ impl DueFilter {
                     .collect()
             },
             DueFilter::DueToday => {
-                let today_start = Utc::now().naive_utc().date().and_hms_opt(0, 0, 0).unwrap();
-                let today_end = Utc::now().naive_utc().date().and_hms_opt(23, 59, 59).unwrap();
+                let today = Utc::now().naive_utc().date();
 
                 tasks.iter()
                     .filter(|t| {
-                        t.due_date.naive_utc() >= today_start && t.due_date.naive_utc() <= today_end
+                        let due_date = t.due_date.naive_utc().date();
+                        due_date == today
                     })
                     .cloned()
                     .collect()
+
             },
             DueFilter::DueThisWeek => {
                 let start = Utc::now().naive_utc(); 
