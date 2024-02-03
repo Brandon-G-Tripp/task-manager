@@ -95,6 +95,50 @@ mod tests{
         
         assert!(output.contains("Task 1"));
     }
+
+    #[test]
+    fn test_delete_command() {
+        let mut tasks = Tasks::new();
+        tasks.add_task("Task 1".to_string(), "".to_string(), "2023-03-01T12:00:00Z".to_string());
+
+        let cmd = TaskCommand::Delete { id: 1 };
+        run(&mut tasks, &cmd);
+
+        assert_eq!(tasks.tasks.len(), 0);
+    } 
+
+    #[test]
+    fn test_update_command() {
+        let mut tasks = Tasks::new();
+        tasks.add_task("Task 1".to_string(), "".to_string(), "2023-03-01T12:00:00Z".to_string());
+
+        let cmd = TaskCommand::Update {
+            id: 1,
+            fields: "name:New Name, description:Update desc, completed:true".to_string(),
+        }; 
+
+        run(&mut tasks, &cmd);
+
+        assert_eq!(tasks.tasks[0].name, "New Name");
+        assert!(tasks.tasks[0].completed);
+    } 
+    fn test_stats_command() {
+        let mut tasks = Tasks::new();
+        tasks.add_task("Task 1".to_string(), "".to_string(), "2023-03-01T12:00:00Z".to_string());
+        tasks.add_task("Task 2".to_string(), "".to_string(), "2023-03-01T12:00:00Z".to_string());
+        tasks.add_task("Task 3".to_string(), "".to_string(), "2023-03-01T12:00:00Z".to_string());
+
+        tasks.complete_task(1);
+
+        let cmd = TaskCommand::Stats; 
+        let mut writer = Vec::new();
+        run(&mut tasks, &cmd);
+        tasks.stats();
+
+        let output = String::from_utf8(writer).unwrap();
+        assert!(output.contains("Tasks: 3"));
+        assert!(output.contains("Completed: 1")); 
+    }
 }
     
     
