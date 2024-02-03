@@ -238,5 +238,12 @@ mod tests {
         assert!(matches!(incomplete_filter, Ok(CompletionFilter::Incomplete)));
         assert!(CompletionFilter::from_str("invalid").is_err());
     } 
+
+    #[test]
+    fn format_completion_filter() {
+        assert_eq!(format!("{}", CompletionFilter::All), "all");
+        assert_eq!(format!("{}", CompletionFilter::Complete), "complete"); 
+        assert_eq!(format!("{}", CompletionFilter::Incomplete), "incomplete");
+    }
     
 } 
