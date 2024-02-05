@@ -49,7 +49,7 @@ pub fn parse_update_fields(update_args: &str) -> Result<UpdateFields, TaskError>
         let kv: Vec<_> = pair.splitn(2, ':').collect();
 
         if kv.len() != 2 {
-            continue
+            return Err(TaskError::InvalidInput("Invalid input. Not a key/value pair.".to_string()));
         }
 
         let key = kv[0];
@@ -70,7 +70,10 @@ pub fn parse_update_fields(update_args: &str) -> Result<UpdateFields, TaskError>
                 } 
                 update_fields.completed = Some(value.to_string());
             },
-            _ => println!("Unknown field key: {}", key),
+            _ => {
+                let err_string = format!("Unknown field key: {}", key);
+                return Err(TaskError::InvalidInput(err_string))
+            },
         }
     }
 
