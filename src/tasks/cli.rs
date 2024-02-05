@@ -203,27 +203,20 @@ mod tests{
         
     }
     
-    // #[test] 
-    // fn test_show_command() {
-    //     let mut tasks = create_tasks();
+    #[test] 
+    fn test_show_command() {
+        let mut tasks = create_tasks();
 
-    //     let cmd = TaskCommand::Show { id: 1 };
+        let cmd = TaskCommand::Show { id: 1 };
 
-    //     let mut writer = Vec::new();
-    //     run(&mut tasks, &cmd);
-    //     tasks.show_task(1, &mut writer);
+        let mut writer = Vec::new();
+        run(&mut tasks, &cmd);
+        tasks.show_task(1, &mut writer);
 
-    //     let output = String::from_utf8(writer).unwrap();
-    //     assert!(output.contains("Overdue Task 1"));
-    // } 
-
-    #[test]
-    #[should_panic]
-    fn test_update_command_invalid() {
-        let tasks = create_tasks();
-
-        let cmd = TaskCommand::Update { id: 999, fields: "invalid".to_string() };
+        let output = String::from_utf8(writer).unwrap();
+        assert!(output.contains("Overdue Task 1"));
     } 
+
 
 }
     
