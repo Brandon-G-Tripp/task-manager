@@ -35,13 +35,13 @@ pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
         TaskCommand::Update { id, fields } => {
             let update_fields = update::parse_update_fields(&fields);
             print!("we are in update branch");
-            tasks.update_task(*id, update_fields);
+            let _ = tasks.update_task(*id, update_fields);
         } 
         TaskCommand::Show{ id } => {
-            tasks.show_task(*id, &mut std::io::stdout());
+            let _ = tasks.show_task(*id, &mut std::io::stdout());
         } 
         TaskCommand::Complete { id } => {
-            tasks.complete_task(*id);
+            let _ = tasks.complete_task(*id);
         } 
         TaskCommand::Stats => {
             let stats = tasks.stats();
@@ -180,6 +180,46 @@ mod tests{
         assert!(output.contains("Task 1"));
         assert!(!output.contains("Task 2"));
     }
+
+    #[test]
+    fn test_list_command_filters() { 
+        let mut tasks = create_tasks();
+
+        tasks.complete_task(1).expect("There was an error updating the task's completion status.");
+
+        let cmd = TaskCommand::List { due: Some(DueFilter::PastDue), status: Some(CompletionFilter::Complete) };
+
+        let mut writer = Vec::new();
+        run(&mut tasks, &cmd);
+        tasks.list_tasks(&mut writer, &Some(DueFilter::PastDue), &Some(CompletionFilter::Complete));
+
+        let output = String::from_utf8(writer).unwrap();
+        assert!(output.contains("Overdue Task 1"));
+        
+    }
+    
+    // #[test] 
+    // fn test_show_command() {
+    //     let mut tasks = create_tasks();
+
+    //     let cmd = TaskCommand::Show { id: 1 };
+
+    //     let mut writer = Vec::new();
+    //     run(&mut tasks, &cmd);
+    //     tasks.show_task(1, &mut writer);
+
+    //     let output = String::from_utf8(writer).unwrap();
+    //     assert!(output.contains("Overdue Task 1"));
+    // } 
+
+    #[test]
+    #[should_panic]
+    fn test_update_command_invalid() {
+        let tasks = create_tasks();
+
+        let cmd = TaskCommand::Update { id: 999, fields: "invalid".to_string() };
+    } 
+
 }
     
     
