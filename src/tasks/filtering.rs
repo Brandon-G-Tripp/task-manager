@@ -138,7 +138,7 @@ mod tests {
     #[test]
     fn filter_past_due() {
         let tasks = create_tasks();
-        let results = DueFilter::PastDue.filter(&tasks);
+        let results = DueFilter::PastDue.filter(&tasks.tasks);
         println!("{:?}", results);
         assert_eq!(results.len(), 2);
         assert_eq!(results[0].id, 1);
@@ -148,7 +148,7 @@ mod tests {
     #[test]
     fn filter_due_today() {
         let tasks = create_tasks();
-        let results = DueFilter::DueToday.filter(&tasks);
+        let results = DueFilter::DueToday.filter(&tasks.tasks);
         println!("{:?}", results);
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].id, 3);
@@ -157,7 +157,7 @@ mod tests {
     #[test]
     fn filter_due_this_week() {
         let tasks = create_tasks();
-        let results = DueFilter::DueThisWeek.filter(&tasks);
+        let results = DueFilter::DueThisWeek.filter(&tasks.tasks);
         assert_eq!(results.len(), 3);
         assert_eq!(results[0].id, 3);
         assert_eq!(results[1].id, 4);
@@ -167,7 +167,7 @@ mod tests {
     #[test]
     fn filter_all() {
         let tasks = create_tasks();
-        let results = DueFilter::All.filter(&tasks);
+        let results = DueFilter::All.filter(&tasks.tasks);
         assert_eq!(results.len(), 5);
         assert_eq!(results[0].id, 1);
         assert_eq!(results[1].id, 2);
