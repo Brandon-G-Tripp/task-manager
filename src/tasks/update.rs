@@ -81,10 +81,46 @@ pub fn parse_update_fields(update_args: &str) -> Result<UpdateFields, TaskError>
 } 
 
 fn valid_due_date_format(value: &str) -> bool {
-    Regex::new(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}")?.is_match(value)
+    let reg = Regex::new(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}").unwrap();
+    reg.is_match(value)
 } 
 
 fn valid_completed_format(value: &str) -> bool {
     value == "true" || value == "false"
 } 
 
+
+#[cfg(test)]
+mod tests {
+    use crate::tasks::TaskError;
+
+    use super::parse_update_fields;
+
+    #[test]
+    fn test_parse_update_invalid() {
+        let result = parse_update_fields("invalid");
+
+        assert!(result.is_err());
+        assert!(matches!(result.err().unwrap(), TaskError::InvalidInput(_)));
+    } 
+
+    #[test]
+    fn test_parse_update_invalid_completed(){
+        let result = parse_update_fields("completed:invalid");
+        
+        let err_str = "Invalid boolean string for completed".to_string();
+        assert!(result.is_err());
+        assert!(matches!(result.err().unwrap(), TaskError::InvalidInput(err_str)));
+    }
+
+
+    #[test]
+    fn test_parse_update_invalid_due_date(){
+        let result = parse_update_fields("due_date:invalid");
+
+        let err_str = "Invalid datetime format for due date".to_string();
+        assert!(result.is_err());
+        assert!(matches!(result.err().unwrap(), TaskError::InvalidInput(err_str)));
+    }
+
+} 
