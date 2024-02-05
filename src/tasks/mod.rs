@@ -64,6 +64,9 @@ impl From<serde_yaml::Error> for TaskError {
 
 #[cfg(test)]
 mod tests {
+    use crate::tasks::{TaskError, Task};
+    use serde_yaml::Error;
+
     #[test]
     fn test_task_error_display() {
         let err = TaskError::NotFound;
@@ -84,10 +87,24 @@ mod tests {
         let err = TaskError::Io(std::io::Error::new(std::io::ErrorKind::Other, "io error"));
         assert_eq!(err.to_string(), "IO error: io error");
 
-        let err = TaskError::Yaml(serde_yaml::Error::explicit("yaml error"));
-        assert_eq!(err.to_string(), "YAML error: yaml error");
+        let bad_yaml = "%%not_valid_yaml";
+        let yaml_err = serde_yaml::from_str::<serde_yaml::Value>(bad_yaml).unwrap_err();
+        let err = TaskError::Yaml(yaml_err);
+        assert_eq!(err.to_string(), "YAML error: while scanning a directive, could not find expected directive name at line 1 column 2");
 
         let err = TaskError::InvalidInput("invalid input".to_string());
         assert_eq!(err.to_string(), "Invalid input: invalid input");
     }
+
+        #[test]
+    fn test_task_error_from() {
+        let io_err = std::io::Error::new(std::io::ErrorKind::Other, "io error");
+        assert!(matches!(TaskError::from(io_err), TaskError::Io(_)));
+
+        let bad_yaml = "%%not_valid_yaml";
+        let yaml_err = serde_yaml::from_str::<serde_yaml::Value>(bad_yaml).unwrap_err();
+        assert!(matches!(TaskError::from(yaml_err), TaskError::Yaml(_)));
+    }
+
+
 } 
