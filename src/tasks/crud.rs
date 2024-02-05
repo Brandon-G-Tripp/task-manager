@@ -82,7 +82,7 @@ impl Tasks {
         let task_id = id;
 
         match self.find_task_by_id(task_id) {
-            Some((index, mut task)) => {
+            Some((index, task)) => {
 
                 // new task 
                 let due_date = fields.due_date.unwrap_or(task.due_date.to_string());

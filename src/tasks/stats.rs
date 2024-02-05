@@ -39,7 +39,6 @@ impl fmt::Display for Stats {
         write!(f, "Percent completed: {}\n", self.percent_completed);
 
         Ok(())
-
     }
 } 
 
@@ -47,7 +46,7 @@ impl fmt::Display for Stats {
 fn test_stats() {
     use crate::tests_common::{create_tasks, create_tasks_completion};
     // Arrange 
-    let mut tasks = create_tasks_completion();
+    let tasks = create_tasks_completion();
 
     //Act 
     let stats = tasks.stats();
