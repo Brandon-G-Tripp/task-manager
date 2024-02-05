@@ -33,9 +33,14 @@ pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
             tasks.delete_task(*id);
         } 
         TaskCommand::Update { id, fields } => {
-            let update_fields = update::parse_update_fields(&fields);
-            print!("we are in update branch");
-            let _ = tasks.update_task(*id, update_fields);
+            match update::parse_update_fields(&fields) {
+                Ok(update_fields) => {
+                    let _ = tasks.update_task(*id, update_fields);
+                }
+                Err(err) => {
+                    print!("Error parsing update fields: {}", err);
+                } 
+            }
         } 
         TaskCommand::Show{ id } => {
             let _ = tasks.show_task(*id, &mut std::io::stdout());
