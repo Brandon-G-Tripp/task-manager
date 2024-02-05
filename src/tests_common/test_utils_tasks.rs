@@ -2,14 +2,21 @@ use chrono::Utc;
 
 use crate::tasks::{Task, Tasks};
 
-pub fn create_tasks() -> Vec<Task> {
-    vec![
-        Task::new(1, "Task 1".to_string(), "Description".to_string(), (Utc::now() - chrono::Duration::days(3)).to_string()),
-        Task::new(2, "Task 2".to_string(), "Description".to_string(), (Utc::now() - chrono::Duration::days(2)).to_string()),
+pub fn create_tasks() -> Tasks {
+    let mut tasks = Tasks::new();
+    let tasks_vec = vec![
+        Task::new(1, "Task 1".to_string(), "Description: Overdue Task 1".to_string(), (Utc::now() - chrono::Duration::days(3)).to_string()),
+        Task::new(2, "Task 2".to_string(), "Description: Overdue Task 2".to_string(), (Utc::now() - chrono::Duration::days(2)).to_string()),
         Task::new(3, "Task 3".to_string(), "Description".to_string(), (Utc::now() + chrono::Duration::hours(2)).to_string()),
         Task::new(4, "Task 4".to_string(), "Description".to_string(), (Utc::now() + chrono::Duration::days(1)).to_string()),
         Task::new(5, "Task 5".to_string(), "Description".to_string(), (Utc::now() + chrono::Duration::days(2)).to_string())
-    ]
+    ];
+
+    for task in tasks_vec {
+        tasks.add_task(task.name, task.description, task.due_date.to_string());
+    } 
+
+    tasks
 }
 
 pub fn create_tasks_completion() -> Tasks {
