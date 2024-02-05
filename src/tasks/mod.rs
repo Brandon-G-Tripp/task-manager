@@ -27,6 +27,7 @@ pub enum TaskError {
     ParseBoolError,
     Io(std::io::Error),
     Yaml(serde_yaml::Error),
+    InvalidInput(String),
 }
 
 
@@ -40,6 +41,7 @@ impl std::fmt::Display for TaskError {
             TaskError::ParseBoolError => write!(f, "Error parsing string to boolean"),
             TaskError::Io(err) => write!(f, "IO error: {}", err),
             TaskError::Yaml(err) => write!(f, "YAML error: {}", err),
+            TaskError::InvalidInput(msg) => write!(f, "Invalid input: {}", msg),
         } 
     } 
 } 
