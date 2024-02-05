@@ -60,3 +60,34 @@ impl From<serde_yaml::Error> for TaskError {
         TaskError::Yaml(err)
     } 
 } 
+
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_task_error_display() {
+        let err = TaskError::NotFound;
+        assert_eq!(err.to_string(), "Task not found");
+
+        let err = TaskError::NoFile;
+        assert_eq!(err.to_string(), "No file found");
+
+        let err = TaskError::InvalidTaskId;
+        assert_eq!(err.to_string(), "Invalid task ID");
+
+        let err = TaskError::ParseUpdateError;
+        assert_eq!(err.to_string(), "Erroring in parsing update");
+
+        let err = TaskError::ParseBoolError;
+        assert_eq!(err.to_string(), "Error parsing string to boolean");
+
+        let err = TaskError::Io(std::io::Error::new(std::io::ErrorKind::Other, "io error"));
+        assert_eq!(err.to_string(), "IO error: io error");
+
+        let err = TaskError::Yaml(serde_yaml::Error::explicit("yaml error"));
+        assert_eq!(err.to_string(), "YAML error: yaml error");
+
+        let err = TaskError::InvalidInput("invalid input".to_string());
+        assert_eq!(err.to_string(), "Invalid input: invalid input");
+    }
+} 
