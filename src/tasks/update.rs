@@ -34,7 +34,7 @@ impl FromStr for UpdateFields {
         let fields: Vec<&str> = s.splitn(3, ' ').collect();
 
         Ok(Self {
-            name: fields.get(0).map(|s| s.to_string()),
+            name: fields.first().map(|s| s.to_string()),
             description: fields.get(1).map(|s| s.to_string()),
             due_date: fields.get(2).map(|s| s.to_string()),
             completed: fields.get(3).map(|s| s.to_string()),
