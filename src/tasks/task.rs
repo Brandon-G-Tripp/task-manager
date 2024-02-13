@@ -1,7 +1,6 @@
 use core::fmt;
 
 use chrono::{DateTime, Utc};
-use colored::Colorize;
 use serde::{Serialize, Deserialize};
 
 #[derive(PartialEq, Debug, Serialize, Deserialize, Clone)]
@@ -19,10 +18,10 @@ impl fmt::Display for Task {
         write!(
             f, 
             "{} - {} - {} - {}",
-            self.id.to_string().blue(),
-            self.name.to_string().green(),
+            self.id,
+            self.name,
             self.description,
-            self.due_date.format("%Y-%m-%d").to_string().yellow()
+            self.due_date
         )
     } 
 } 
