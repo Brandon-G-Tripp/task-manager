@@ -138,10 +138,10 @@ mod tests{
         tasks.add_task("Task 2".to_string(), "".to_string(), "2023-03-01T12:00:00Z".to_string());
         tasks.add_task("Task 3".to_string(), "".to_string(), "2023-03-01T12:00:00Z".to_string());
 
-        tasks.complete_task(1);
+        let _ = tasks.complete_task(1);
 
         let cmd = TaskCommand::Stats; 
-        let mut writer = Vec::new();
+        let writer = Vec::new();
         run(&mut tasks, &cmd);
         tasks.stats();
 
@@ -211,7 +211,7 @@ mod tests{
 
         let mut writer = Vec::new();
         run(&mut tasks, &cmd);
-        tasks.show_task(1, &mut writer);
+        let _ = tasks.show_task(1, &mut writer);
 
         let output = String::from_utf8(writer).unwrap();
         assert!(output.contains("Overdue Task 1"));
