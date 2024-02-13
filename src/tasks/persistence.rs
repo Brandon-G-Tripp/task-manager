@@ -13,7 +13,7 @@ struct TasksSchema {
 
 pub fn save_tasks(tasks: &Tasks, path: Option<&Path>) -> Result<(), TaskError> {
     let path = path.unwrap_or(Path::new(TASKS_FILE));
-    write_tasks(&tasks, path)?;
+    write_tasks(tasks, path)?;
     Ok(())
 } 
 
