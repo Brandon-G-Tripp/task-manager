@@ -87,7 +87,7 @@ impl From<SystemTimeError> for ConfigError {
 #[cfg(test)]
 mod tests {
 
-    use std::{fs::{File, Permissions}, env, os::unix::fs::PermissionsExt};
+    use std::{fs::{File, Permissions}, env, os::unix::fs::PermissionsExt, io::Write};
 
     use chrono::{Duration, Utc, DateTime};
 
@@ -153,7 +153,6 @@ mod tests {
         assert!(matches!(result, Err(ConfigError::InvalidPath)));
     } 
 
-    
     // #[test]
     // fn test_load_io_error() {
     //     let mut config = Config::new();
