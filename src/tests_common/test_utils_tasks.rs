@@ -27,8 +27,9 @@ pub fn create_tasks_completion() -> Tasks {
     tasks.add_task("Task 2".to_string(), "Description".to_string(), (Utc::now() + chrono::Duration::days(3)).to_string());
     tasks.add_task("Task 3".to_string(), "Description".to_string(), (Utc::now() + chrono::Duration::days(2)).to_string());
 
-    tasks.complete_task(1);
-    tasks.complete_task(2);
+    // these are ignored because this is only for testing 
+    let _ = tasks.complete_task(1);
+    let _ = tasks.complete_task(2);
 
     tasks
 } 

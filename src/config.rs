@@ -121,7 +121,7 @@ mod tests {
 
         // Write string to temp file 
         let tmp_file_path = "tmp.yml";
-        std::fs::write(tmp_file_path, yaml);
+        let _ = std::fs::write(tmp_file_path, yaml);
 
         // Assert file exists 
         assert!(Path::new(tmp_file_path).exists());
@@ -141,7 +141,7 @@ mod tests {
         assert_eq!(config.path, Some("tmp.yml".into()));
         assert!(config.last_updated > 0);
 
-        std::fs::remove_file(tmp_file_path);
+        let _ = std::fs::remove_file(tmp_file_path);
     } 
 
     #[test]
@@ -164,7 +164,7 @@ mod tests {
         let test_path_return = binding.to_str().unwrap();
 
         // open file
-        File::create(test_path.clone());
+        let _ = File::create(test_path.clone());
 
         // Deny all permissions
         let mut perms = fs::metadata(test_path.clone())
@@ -200,7 +200,7 @@ mod tests {
         let yaml = "invalid";
 
         let tmp_file = "tmp.yaml";
-        std::fs::write(tmp_file, yaml);
+        let _ = std::fs::write(tmp_file, yaml);
 
         let result = config.load(tmp_file);
 
