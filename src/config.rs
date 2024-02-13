@@ -1,6 +1,5 @@
 use std::{path::Path, fs, time::{SystemTime, UNIX_EPOCH, SystemTimeError}};
 use serde::Deserialize;
-use chrono;
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
@@ -30,7 +29,7 @@ impl Config {
 
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
-            .map_err(|e| ConfigError::SystemTimeError(e))?
+            .map_err(ConfigError::SystemTimeError)?
             .as_secs();
 
         let new_config = Config {
