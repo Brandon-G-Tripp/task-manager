@@ -1,4 +1,5 @@
 use std::fmt;
+use std::io::Write;
 
 use crate::tasks::{Task, Tasks};
 
@@ -34,9 +35,9 @@ impl Stats {
 
 impl fmt::Display for Stats {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Total: {}\n", self.total);
-        write!(f, "Completed: {}\n", self.completed);
-        write!(f, "Percent completed: {}\n", self.percent_completed);
+        writeln!(f, "Total: {}", self.total)?;
+        writeln!(f, "Completed: {}", self.completed)?;
+        writeln!(f, "Percent completed: {}", self.percent_completed)?;
 
         Ok(())
     }
