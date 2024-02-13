@@ -3,7 +3,6 @@ on:
   push: 
     branches:
       - main
-      - 'feature/*'
     tags:
       - 'v*.*.*'
 
@@ -37,6 +36,7 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps: 
       - uses: actions/checkout@v4
       - name: Build release
