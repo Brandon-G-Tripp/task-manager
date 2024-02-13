@@ -1,5 +1,14 @@
 # Rust CLI - Task Manager with Snippet Integration
 
+## Testing 
+
+1. Steps to test with tarpaulin
+`rust
+$ cargo clean
+$ cargo build
+$ cargo tarpaulin --skip-clean 
+`
+
 ## Roadmap for further development
 
 ### 1. Tasks Module 
