@@ -153,8 +153,6 @@ mod tests {
         assert!(matches!(result, Err(ConfigError::InvalidPath)));
     } 
 
-    // #[test]
-    // fn test_load_io_error() {
     //     let mut config = Config::new();
     //     let tmp_dir = env::temp_dir();
     //     let test_path = tmp_dir.with_file_name("test_load_io_error.yaml");
