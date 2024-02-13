@@ -33,7 +33,7 @@ pub fn run(tasks: &mut Tasks, cmd: &TaskCommand) {
             tasks.delete_task(*id);
         } 
         TaskCommand::Update { id, fields } => {
-            match update::parse_update_fields(&fields) {
+            match update::parse_update_fields(fields) {
                 Ok(update_fields) => {
                     let _ = tasks.update_task(*id, update_fields);
                 }
