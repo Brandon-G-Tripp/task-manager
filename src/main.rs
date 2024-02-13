@@ -80,7 +80,7 @@ mod tests {
 
     #[test]
     fn test_tasks_command() {
-        test_setup::setup();
+        // test_setup::setup();
 
         let mut cmd = Command::cargo_bin("task-manager").unwrap();
 
@@ -98,7 +98,7 @@ mod tests {
 
     #[test]
     fn test_snippets_command() {
-        test_setup::setup();
+        // test_setup::setup();
 
         let mut cmd = Command::cargo_bin("task-manager").unwrap();
         cmd.arg("snippets");
@@ -112,7 +112,7 @@ mod tests {
 
     #[test]
     fn test_timers_command() {
-        test_setup::setup();
+        // test_setup::setup();
 
         let mut cmd = Command::cargo_bin("task-manager").unwrap();
         cmd.arg("timers");
@@ -126,7 +126,7 @@ mod tests {
 
     #[test]
     fn test_update_command() {
-        test_setup::setup();
+        // test_setup::setup();
 
         let mut cmd = Command::cargo_bin("task-manager").unwrap();
 
