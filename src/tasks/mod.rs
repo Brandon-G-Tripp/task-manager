@@ -1,7 +1,6 @@
 use std::error::Error;
 
 use serde::{Serialize, Deserialize};
-use serde_yaml;
 
 mod task;
 mod crud;
