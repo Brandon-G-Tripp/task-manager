@@ -219,7 +219,7 @@ mod tests {
             ..Default::default() 
         };
         
-        tasks.update_task(1, updated_fields);
+        let _ = tasks.update_task(1, updated_fields);
 
         // Validate after update 
         let (index, updated_task) = tasks.find_task_by_id(1).unwrap();
@@ -245,7 +245,7 @@ mod tests {
 
         // Act 
         let mut output = Vec::new();
-        tasks.show_task(1, &mut output);
+        let _ = tasks.show_task(1, &mut output);
         
         // Assert 
         let result = String::from_utf8(output).unwrap();
@@ -261,7 +261,7 @@ mod tests {
         tasks.add_task("Task 1".to_string(), "Text for task1".to_string(), due_date); 
 
         // Act
-        tasks.complete_task(1);
+        let _ = tasks.complete_task(1);
 
         // Assert 
         let (_, task) = tasks.find_task_by_id(1).unwrap();
