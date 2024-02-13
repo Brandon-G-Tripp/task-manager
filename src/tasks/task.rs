@@ -1,6 +1,7 @@
 use core::fmt;
 
 use chrono::{DateTime, Utc};
+use colored::Colorize;
 use serde::{Serialize, Deserialize};
 
 #[derive(PartialEq, Debug, Serialize, Deserialize, Clone)]
@@ -15,7 +16,14 @@ pub struct Task {
 
 impl fmt::Display for Task {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?} - {} - {} - {}", self.id, self.name, self.description, self.due_date)
+        write!(
+            f, 
+            "{} - {} - {} - {}",
+            self.id.to_string().blue(),
+            self.name.to_string().green(),
+            self.description,
+            self.due_date.format("%Y-%m-%d").to_string().yellow()
+        )
     } 
 } 
 
