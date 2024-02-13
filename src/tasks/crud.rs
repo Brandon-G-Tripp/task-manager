@@ -41,9 +41,7 @@ impl Tasks {
 
         self.tasks.push(new_task);
 
-        let index = self.tasks.len() - 1;
-
-        index
+        self.tasks.len() - 1
     } 
 
     pub fn delete_task(&mut self, id: u32) -> bool {
@@ -71,10 +69,12 @@ impl Tasks {
         let due_filter = due.as_ref().unwrap_or(&DueFilter::All);
         let completion_filter = status.as_ref().unwrap_or(&CompletionFilter::All);
 
-        let filtered = Tasks::filter_tasks(&all_tasks, &due_filter, &completion_filter);
+        let filtered = Tasks::filter_tasks(all_tasks, due_filter, completion_filter);
 
         for task in filtered {
-           writeln!(writer, "{}", task); 
+           writeln!(writer, "{}", task).unwrap_or_else(|e| {
+               eprintln!("Error writing: {}", e);
+           }); 
         } 
     }
 
@@ -120,7 +120,7 @@ impl Tasks {
     pub fn show_task(&self, id: u32, writer: &mut impl Write) -> Result<(), TaskError> {
         match self.find_task_by_id(id) {
             Some((_, task)) => {
-                writeln!(writer, "{}", task);
+                writeln!(writer, "{}", task)?;
                 Ok(())
             },
             None => Err(TaskError::NotFound)
@@ -137,7 +137,7 @@ impl Tasks {
     } 
 
     pub fn filter_tasks(tasks: &[Task], due_filter: &DueFilter, completion_filter: &CompletionFilter) -> Vec<Task> {
-        let mut filtered = due_filter.filter(&tasks);
+        let mut filtered = due_filter.filter(tasks);
         filtered = completion_filter.filter(&filtered);
         filtered
     }
